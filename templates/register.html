@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!-- Add Firebase SDK -->
+    <script type="module">
+        // Import Firebase libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js"; // Updated to the latest version
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js"; // Updated to the latest version
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD2dBzwq2uiCnASi3PTruIKJ-nBVzlaMsc", // Use your actual API key
+            authDomain: "iak-retail-kelompok-8.firebaseapp.com", // Use your actual authDomain
+            projectId: "iak-retail-kelompok-8", // Use your actual projectId
+            storageBucket: "iak-retail-kelompok-8.appspot.com", // Use your actual storageBucket
+            messagingSenderId: "530693322081", // Use your actual messagingSenderId
+            appId: "1:530693322081:web:270153437034677ad10120", // Use your actual appId
+            measurementId: "G-W6448PF8BE" // Use your actual measurementId if available
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Registration function
+        window.registerUser = function (email, password) {
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // User registered successfully
+                    // Store a success message in localStorage
+                    localStorage.setItem('registrationSuccess', 'Account successfully created!');
+
+                    // Redirect to login page
+                    window.location.href = "/login"; // Adjust the redirect as necessary
+                })
+                .catch((error) => {
+                    const errorMessage = error.message;
+
+                    // Display error message in the errorBox
+                    const errorBox = document.getElementById('errorBox');
+                    const errorMessageElement = document.getElementById('errorMessage');
+                    errorMessageElement.textContent = errorMessage; // Set the error message
+                    errorBox.classList.remove('hidden'); // Show the error box
+
+                    console.error(error.code, errorMessage); // Log the error for debugging
+                });
+        }
+
+        // Handle form submission
+        window.submitForm = function (event) {
+            event.preventDefault();
+            const email = document.querySelector('input[name="email"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+
+            registerUser(email, password); // Call the registration function
+        }
+
+        // Function to navigate to login page
+        window.goToLogin = function () {
+            window.location.href = "/login"; // Adjust the redirect as necessary
+        }
+    </script>
+</head>
+
+<body class="flex min-h-screen font-poppins">
+    <!-- Registration Form Half -->
+    <div class="w-1/2 flex items-center justify-center">
+        <div class="flex flex-col items-center p-10 w-full max-w-md">
+            <h1 class="text-5xl font-bold text-black mb-8 text-center">Register</h1>
+            <form onsubmit="submitForm(event);" class="w-full">
+                <input type="email" name="email" placeholder="Email" required
+                    class="border border-gray-300 rounded-md p-3 mb-6 w-full text-lg">
+                <input type="password" name="password" placeholder="Password" required
+                    class="border border-gray-300 rounded-md p-3 mb-6 w-full text-lg">
+                <button type="submit"
+                    class="bg-blue-600 text-white rounded-md p-3 w-full text-lg hover:bg-blue-700 transition duration-300">Register</button>
+            </form>
+
+            <div class="text-center mt-4">
+                <button onclick="window.goToLogin()" class="text-blue-600 text-lg">Already have an account? Login
+                    here</button>
+            </div>
+
+            <!-- Error Message Box -->
+            <div id="errorBox"
+                class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mt-5 w-full">
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gradient Background Half -->
+    <div class="w-1/2 bg-gradient-to-br from-[#40DDC1] via-[#008DBD] to-[#00388E] flex items-center justify-center">
+        <h1 class="text-white text-5xl font-bold">Welcome to PedalXPress</h1>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+[debug] [2024-09-26T11:54:36.899Z] ----------------------------------------------------------------------
+[debug] [2024-09-26T11:54:36.900Z] Command:       /opt/homebrew/Cellar/node/21.2.0/bin/node /opt/homebrew/bin/firebase init
+[debug] [2024-09-26T11:54:36.901Z] CLI Version:   13.19.0
+[debug] [2024-09-26T11:54:36.901Z] Platform:      darwin
+[debug] [2024-09-26T11:54:36.901Z] Node Version:  v21.2.0
+[debug] [2024-09-26T11:54:36.901Z] Time:          Thu Sep 26 2024 18:54:36 GMT+0700 (Western Indonesia Time)
+[debug] [2024-09-26T11:54:36.901Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-09-26T11:54:36.904Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-09-26T11:54:36.904Z] > authorizing via signed-in user (diazarvinda@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/diazardian/Desktop/UTS - IAK
+
+[debug] [2024-09-27T12:32:20.247Z] Error: read EIO
+    at TTY.onStreamRead (node:internal/stream_base_commons:217:20)
