@@ -2,3 +2,4 @@ venv/
 env/
 config/
 node_modules/
+__pycache__/
