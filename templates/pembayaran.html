@@ -22,8 +22,8 @@
 
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <form id="transactionForm" method="POST" onsubmit="event.preventDefault(); addToCart();">
-            <div class="flex flex-col md:flex-row md:space-x-4">
-                <div class="mb-4 w-full md:w-2/5">
+            <div class="flex flex-row space-x-8">
+                <div class="w-full px-4">
                     <label for="item" class="block text-gray-700 text-sm font-bold mb-2">Barang:</label>
                     <select id="item" name="item" required
                         class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -33,12 +33,24 @@
                         <option value="Sepeda Ontel C">Sepeda Ontel C - Rp 2.000.000</option>
                     </select>
                 </div>
-                <div class="mb-4 w-full md:w-2/5">
+                <div class="w-full px-4">
                     <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
-                    <input type="number" id="quantity" name="quantity" required min="1"
-                        class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex items-center">
+                        <button type="button" onclick="decrementQuantity()" class="text-gray-600 hover:text-gray-700
+                            hover:bg-gray-300 h-full w-12 rounded-l-lg cursor-pointer outline-none">
+                            <span class="m-auto text-3xl font-thin">−</span>
+                        </button>
+                        <input type="number" id="quantity" name="quantity" required min="1" value="1"
+                            class="border-t border-b border-gray-300 text-center w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs px-2 py-3"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <button type="button" onclick="incrementQuantity()" class="text-gray-600 hover:text-gray-700
+                            hover:bg-gray-300 h-full w-12 rounded-r-lg cursor-pointer">
+                            <span class="m-auto text-3xl font-thin">+</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="w-full md:w-1/5 flex items-end">
+                <div class="w-full px-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">&nbsp;</label>
                     <button type="submit"
                         class="bg-[#40DDC1] text-white rounded-md py-2 px-4 w-full text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
                         Tambah ke Keranjang
@@ -78,8 +90,23 @@
     const cart = []; // Initialize an empty cart array
     const prices = {
         "Sepeda Ontel A": 1000000,
-        "Sepeda Ontel B": 1200000,
+        "Sepeda Ontel B": 1500000,
         "Sepeda Ontel C": 2000000
+    };
+
+    // Function to increment quantity
+    window.incrementQuantity = function() {
+        const quantityInput = document.getElementById('quantity');
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+    };
+
+    // Function to decrement quantity
+    window.decrementQuantity = function() {
+        const quantityInput = document.getElementById('quantity');
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
     };
 
     // Function to add item to cart
@@ -88,12 +115,22 @@
         const quantity = parseInt(document.getElementById('quantity').value, 10);
         const price = prices[item];  // Get price based on selected item
 
-        const cartItem = { item, quantity, price }; // Price is now calculated based on the model
+        // Check if the item already exists in the cart
+        const existingItemIndex = cart.findIndex(cartItem => cartItem.item === item);
 
-        // Add item to cart
-        cart.push(cartItem);
+        if (existingItemIndex !== -1) {
+            // If item exists, update the quantity and total price
+            cart[existingItemIndex].quantity += quantity;
+            cart[existingItemIndex].totalPrice = cart[existingItemIndex].quantity * price;
+        } else {
+            // If item doesn't exist, add a new item to the cart
+            const cartItem = { item, quantity, price, totalPrice: quantity * price };
+            cart.push(cartItem);
+        }
+
         displayCart();
         document.getElementById('transactionForm').reset(); // Reset the form
+        document.getElementById('quantity').value = 1; // Reset quantity to 1
     };
 
     // Function to display the cart items
@@ -109,7 +146,7 @@
                 row.innerHTML = `
                     <td class="py-3 px-4 border-b">${cartItem.item}</td>
                     <td class="py-3 px-4 border-b">${cartItem.quantity}</td>
-                    <td class="py-3 px-4 border-b">${(cartItem.price * cartItem.quantity).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
+                    <td class="py-3 px-4 border-b">${cartItem.totalPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
                     <td class="py-3 px-4 border-b">
                         <button onclick="removeFromCart(${index})" class="bg-[#DD406C] text-white p-2 rounded-md hover:bg-[#c2385d] transition duration-300 ease-in-out mt-2">
                             <img src="/static/svg/delete.svg" alt="Delete" width="24" height="24">
@@ -140,8 +177,8 @@
         }, duration);
     }
 
-       // Function to save cart
-       window.saveCart = async function() {
+    // Function to save cart
+    window.saveCart = async function() {
         if (cart.length === 0) {
             showMessageBox('errorBox', "Keranjang belanja kosong. Silakan tambahkan barang terlebih dahulu.");
             return;

@@ -16,33 +16,51 @@
     </div>
 
     <!-- Section 1: Order Form -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <form id="orderForm" onsubmit="event.preventDefault(); addToCart();">
-            <div class="mb-4">
-                <label for="supplier" class="block text-gray-700 text-sm font-bold mb-2">Supplier:</label>
-                <select id="supplier" name="supplier" required class="border border-gray-300 rounded-md p-2 w-full"
-                    onchange="updateProductOptions()">
-                    <option value="" disabled selected>Pilih Supplier</option>
-                    <option value="Toko Roda">Toko Roda</option>
-                    <option value="Toko Frame">Toko Frame</option>
-                    <option value="Toko Stang">Toko Stang</option>
-                </select>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <form id="orderForm" method="POST" onsubmit="event.preventDefault(); addToCart();">
+            <div class="flex flex-row space-x-8">
+                <div class="w-full px-4">
+                    <label for="supplier" class="block text-gray-700 text-sm font-bold mb-2">Supplier:</label>
+                    <select id="supplier" name="supplier" required
+                        class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onchange="updateProductOptions()">
+                        <option value="" disabled selected>Pilih Supplier</option>
+                        <option value="Toko Roda">Toko Roda</option>
+                        <option value="Toko Frame">Toko Frame</option>
+                        <option value="Toko Stang">Toko Stang</option>
+                    </select>
+                </div>
+                <div class="w-full px-4">
+                    <label for="product" class="block text-gray-700 text-sm font-bold mb-2">Barang:</label>
+                    <select id="product" name="product" required
+                        class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="" disabled selected>Pilih Barang</option>
+                    </select>
+                </div>
+                <div class="w-full px-4">
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
+                    <div class="flex items-center">
+                        <button type="button" onclick="decrementQuantity()" class="text-gray-600 hover:text-gray-700
+                            hover:bg-gray-300 h-full w-12 rounded-l-lg cursor-pointer outline-none">
+                            <span class="m-auto text-3xl font-thin">−</span>
+                        </button>
+                        <input type="number" id="quantity" name="quantity" required min="1" value="1"
+                            class="border-t border-b border-gray-300 text-center w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs px-2 py-3"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <button type="button" onclick="incrementQuantity()" class="text-gray-600 hover:text-gray-700
+                            hover:bg-gray-300 h-full w-12 rounded-r-lg cursor-pointer">
+                            <span class="m-auto text-3xl font-thin">+</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full px-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">&nbsp;</label>
+                    <button type="submit"
+                        class="bg-[#40DDC1] text-white rounded-md py-2 px-4 w-full text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
+                        Tambah ke Keranjang
+                    </button>
+                </div>
             </div>
-            <div class="mb-4">
-                <label for="product" class="block text-gray-700 text-sm font-bold mb-2">Barang:</label>
-                <select id="product" name="product" required class="border border-gray-300 rounded-md p-2 w-full">
-                    <option value="" disabled selected>Pilih Barang</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
-                <input type="number" id="quantity" name="quantity" required min="1"
-                    class="border border-gray-300 rounded-md p-2 w-full">
-            </div>
-            <button type="submit"
-                class="bg-[#40DDC1] text-white rounded-md py-2 px-4 w-full text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
-                Tambah ke Keranjang
-            </button>
         </form>
     </div>
 
@@ -65,19 +83,24 @@
                 </tbody>
             </table>
         </div>
-        <div class="mb-4">
-            <label for="distributor" class="block text-gray-700 text-sm font-bold mb-2">Distributor:</label>
-            <select id="distributor" name="distributor" required class="border border-gray-300 rounded-md p-2 w-full">
-                <option value="" disabled selected>Pilih Distributor</option>
-                <option value="Distributor A">Distributor A</option>
-                <option value="Distributor B">Distributor B</option>
-                <option value="Distributor C">Distributor C</option>
-            </select>
+        <div class="flex justify-between items-center">
+            <div class="w-2/3 pr-4">
+                <label for="distributor" class="block text-gray-700 text-sm font-bold mb-2">Distributor:</label>
+                <select id="distributor" name="distributor" required
+                    class="border border-gray-300 rounded-md p-2 w-full">
+                    <option value="" disabled selected>Pilih Distributor</option>
+                    <option value="Distributor A">Distributor A</option>
+                    <option value="Distributor B">Distributor B</option>
+                    <option value="Distributor C">Distributor C</option>
+                </select>
+            </div>
+            <div class="w-1/3 pl-4">
+                <button onclick="checkout()"
+                    class="bg-[#40DDC1] text-white rounded-md py-2 px-4 w-full text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
+                    Checkout
+                </button>
+            </div>
         </div>
-        <button onclick="checkout()"
-            class="bg-[#40DDC1] text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
-            Checkout
-        </button>
     </div>
 </div>
 
@@ -184,12 +207,19 @@
             }
 
             const productData = products[supplier].find(p => p.name === product);
-            cart.push({
-                supplier,
-                product,
-                quantity,
-                price: productData.price
-            });
+            const existingItemIndex = cart.findIndex(item => item.product === product);
+
+            if (existingItemIndex !== -1) {
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                cart.push({
+                    supplier,
+                    product,
+                    quantity,
+                    price: productData.price
+                });
+            }
+
             updateCartDisplay();
             document.getElementById('orderForm').reset();
         } catch (error) {
@@ -329,6 +359,21 @@
         } catch (error) {
             console.error('Error:', error);
             showError('Terjadi kesalahan saat menyimpan pesanan.');
+        }
+    }
+
+    // Function to increment quantity
+    function incrementQuantity() {
+        const quantityInput = document.getElementById('quantity');
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+    }
+
+    // Function to decrement quantity
+    function decrementQuantity() {
+        const quantityInput = document.getElementById('quantity');
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
         }
     }
 </script>
