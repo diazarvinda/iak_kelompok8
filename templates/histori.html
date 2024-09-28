@@ -96,7 +96,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, get, set } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD2dBzwq2uiCnASi3PTruIKJ-nBVzlaMsc",
@@ -231,16 +231,65 @@
         errorBox.classList.add('hidden'); // Hide the error box
     }
 
-    window.confirmDelete = function () {
-        const id = document.getElementById('deleteTransactionId').value;
-        const transactionRef = ref(database, 'transactions/' + id);
-        remove(transactionRef).then(() => {
-            showSuccessMessage("Transaksi berhasil dihapus.");
-            closeDeleteModal();
-        }).catch((error) => {
-            alert("Terjadi kesalahan: " + error.message); // Keep this alert for error handling.
+    // ... existing code ...
+
+window.confirmDelete = function () {
+    const id = document.getElementById('deleteTransactionId').value;
+    const transactionRef = ref(database, 'transactions/' + id);
+
+    // First, get the transaction details
+    get(transactionRef).then((snapshot) => {
+        const transaction = snapshot.val();
+        if (transaction) {
+            // Extract the model (A, B, or C) from the item name
+            const model = transaction.item.split(' ').pop();
+            const quantity = transaction.quantity;
+
+            // Update stock
+            updateStock(model, quantity).then(() => {
+                // After updating stock, remove the transaction
+                remove(transactionRef).then(() => {
+                    showSuccessMessage("Transaksi berhasil dihapus dan stok dikembalikan.");
+                    closeDeleteModal();
+                }).catch((error) => {
+                    showErrorMessage("Terjadi kesalahan saat menghapus transaksi: " + error.message);
+                });
+            }).catch((error) => {
+                showErrorMessage("Terjadi kesalahan saat memperbarui stok: " + error.message);
+            });
+        } else {
+            showErrorMessage("Transaksi tidak ditemukan.");
+        }
+    }).catch((error) => {
+        showErrorMessage("Terjadi kesalahan saat mengambil data transaksi: " + error.message);
+    });
+}
+
+function updateStock(model, quantity) {
+    const stockRef = ref(database, 'stock');
+    return get(stockRef).then((snapshot) => {
+        let stock = snapshot.val();
+        if (!stock) {
+            throw new Error("Data stok tidak ditemukan.");
+        }
+
+        // Update stock for each part
+        const partsToUpdate = [`Roda ${model}`, `Frame ${model}`, `Stang ${model}`];
+        partsToUpdate.forEach(part => {
+            const partIndex = stock.findIndex(item => item.nama_produk === part);
+            if (partIndex !== -1) {
+                stock[partIndex].stock += quantity;
+            } else {
+                throw new Error(`Part ${part} tidak ditemukan dalam stok.`);
+            }
         });
-    }
+
+        // Update the stock in Firebase
+        return set(stockRef, stock);
+    });
+}
+
+// ... rest of the existing code ...
 
     function showSuccessMessage(message) {
         const successBox = document.getElementById('successBox');
