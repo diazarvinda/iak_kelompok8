@@ -86,6 +86,10 @@ def confirm_order(): return api_controller().confirm_order(app)
 @login_required
 def submit_order(): return api_controller().submit_order()
 
+@app.route('/api/save_transaction', methods=['POST'])
+@login_required
+def save_transaction(): return api_controller().save_transaction()
+
 @app.route('/api/get/distributor_price', methods=['POST'])
 @login_required
 def get_distributor_price(): return api_controller().get_distributor_price()
