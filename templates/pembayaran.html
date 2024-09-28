@@ -2,53 +2,74 @@
 
 {% block content %}
 <div class="container mx-auto mt-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-5xl font-bold">Transaksi</h1>
-        <!-- Success Message Box -->
-        <div id="successBox"
-            class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl w-1/3">
-            <p id="successMessage"></p>
-        </div>
-        <!-- Error Message Box -->
-        <div id="errorBox" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl w-1/3">
-            <p id="errorMessage"></p>
+    <div class="flex justify-between items-start mb-6">
+        <!-- Transaction Table -->
+        <h1 class="text-4xl font-bold">Transaksi</h1>
+
+        <div class="flex flex-col space-y-4">
+            <!-- Success Message Box -->
+            <div id="successBox"
+                class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl w-64">
+                <p id="successMessage"></p>
+            </div>
+
+            <!-- Error Message Box -->
+            <div id="errorBox" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl w-64">
+                <p id="errorMessage"></p>
+            </div>
         </div>
     </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <form id="transactionForm" method="POST" onsubmit="event.preventDefault(); addToCart();">
-            <div class="flex space-x-2">
-                <div class="mb-4 w-2/5">
+            <div class="flex flex-col md:flex-row md:space-x-4">
+                <div class="mb-4 w-full md:w-2/5">
                     <label for="item" class="block text-gray-700 text-sm font-bold mb-2">Barang:</label>
-                    <select id="item" name="item" required class="border border-gray-300 rounded-md p-2 w-full">
+                    <select id="item" name="item" required
+                        class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="" disabled selected>Pilih Model</option>
                         <option value="Sepeda Ontel A">Sepeda Ontel A - Rp 1.000.000</option>
                         <option value="Sepeda Ontel B">Sepeda Ontel B - Rp 1.500.000</option>
                         <option value="Sepeda Ontel C">Sepeda Ontel C - Rp 2.000.000</option>
                     </select>
                 </div>
-                <div class="mb-4 w-2/5">
+                <div class="mb-4 w-full md:w-2/5">
                     <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
-                    <input type="number" id="quantity" name="quantity" required
-                        class="border border-gray-300 rounded-md p-2 w-full">
+                    <input type="number" id="quantity" name="quantity" required min="1"
+                        class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-full md:w-1/5 flex items-end">
+                    <button type="submit"
+                        class="bg-[#40DDC1] text-white rounded-md py-2 px-4 w-full text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
+                        Tambah ke Keranjang
+                    </button>
                 </div>
             </div>
-            <button type="submit"
-                class="bg-[#40DDC1] text-white rounded-md p-2 text-sm hover:bg-[#33b89d] transition duration-300 ease-in-out">
-                Tambah
-            </button>
         </form>
     </div>
 
     <!-- Cart Section -->
-    <div class="mt-8 bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-2xl font-bold mb-4">Keranjang Belanja</h2>
-        <div id="cartItems" class="">
-            <!-- Cart items will be displayed here -->
+    <div id="cartSection" class="bg-white rounded-lg shadow-md p-6 hidden">
+        <h2 class="text-2xl font-bold mb-4">Keranjang</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full mb-4 border-collapse rounded-lg shadow-md overflow-hidden text-xs">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="text-left py-3 px-4 font-semibold border-b">Item</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Jumlah</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Total Harga</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="cartItems" class="bg-white">
+                    <!-- Cart items will be displayed here -->
+                </tbody>
+            </table>
         </div>
         <button id="saveCart"
-            class="bg-[#40DDC1] text-white rounded-md p-2 text-sm hover:bg-[#33b89d] transition duration-300 ease-in-out mt-4"
+            class="bg-[#40DDC1] text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]"
             onclick="saveCart()">
-            Simpan
+            Simpan Transaksi
         </button>
     </div>
 </div>
@@ -77,20 +98,28 @@
 
     // Function to display the cart items
     function displayCart() {
-        const cartItemsDiv = document.getElementById('cartItems');
-        cartItemsDiv.innerHTML = ''; // Clear existing items
+        const cartSection = document.getElementById('cartSection');
+        const cartItemsBody = document.getElementById('cartItems');
+        cartItemsBody.innerHTML = ''; // Clear existing items
 
-        cart.forEach((cartItem, index) => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex items-center mb-2';
-            itemDiv.innerHTML = `
-                <span class="flex-grow">${cartItem.item} - Jumlah: ${cartItem.quantity} - Total Harga: ${(cartItem.price * cartItem.quantity).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</span>
-                <button onclick="removeFromCart(${index})" class="ml-2 p-1 bg-[#DD406C] rounded-full">
-                    <img src="/static/svg/delete.svg" alt="Delete" width="24" height="24">
-                </button>
-            `;
-            cartItemsDiv.appendChild(itemDiv);
-        });
+        if (cart.length > 0) {
+            cartSection.classList.remove('hidden');
+            cart.forEach((cartItem, index) => {
+                const row = cartItemsBody.insertRow();
+                row.innerHTML = `
+                    <td class="py-3 px-4 border-b">${cartItem.item}</td>
+                    <td class="py-3 px-4 border-b">${cartItem.quantity}</td>
+                    <td class="py-3 px-4 border-b">${(cartItem.price * cartItem.quantity).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
+                    <td class="py-3 px-4 border-b">
+                        <button onclick="removeFromCart(${index})" class="bg-[#DD406C] text-white p-2 rounded-md hover:bg-[#c2385d] transition duration-300 ease-in-out mt-2">
+                            <img src="/static/svg/delete.svg" alt="Delete" width="24" height="24">
+                        </button>
+                    </td>
+                `;
+            });
+        } else {
+            cartSection.classList.add('hidden');
+        }
     }
 
     // Function to remove item from cart

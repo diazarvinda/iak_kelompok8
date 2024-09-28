@@ -262,7 +262,7 @@ def submit_order():
     try:
         db.reference('orders').push(order_data)
         db.reference().update(stock_updates)
-        return jsonify({"message": "Order submitted successfully"}), 200
+        return jsonify({"message": "Pemesanan Berhasil"}), 200
     except Exception as e:
         return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
 
