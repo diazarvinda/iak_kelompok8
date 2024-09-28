@@ -2,7 +2,20 @@
 
 {% block content %}
 <div class="container mx-auto mt-8">
-    <h1 class="text-5xl font-bold mb-6">Pemesanan</h1>
+
+    <div class="flex justify-between items-start mb-6">
+        <!-- Transaction Table -->
+        <h1 class="text-4xl font-bold">Pemesanan</h1>
+
+        <div class="flex flex-col space-y-4">
+            <!-- Success Message Box -->
+            <div id="successBox"
+                class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl w-64">
+                <p id="successMessage"></p>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white rounded-lg shadow-md p-6">
         {% if orders %}
         <div class="overflow-x-auto">
@@ -59,36 +72,46 @@
 </div>
 
 <script>
+    function showSuccess(message) {
+        const successBox = document.getElementById('successBox');
+        const successMessage = document.getElementById('successMessage');
+        successMessage.textContent = message;
+        successBox.classList.remove('hidden');
+        setTimeout(() => {
+            successBox.classList.add('hidden');
+        }, 3000);
+    }
+
     function confirmOrder(orderId) {
-        if (confirm('Apakah Anda yakin ingin mengkonfirmasi pemesanan ini?')) {
-            fetch('/api/confirm_order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        order_id: orderId
-                    }),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
+        fetch('/api/confirm_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: orderId
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message) {
+                    showSuccess(data.message);
+                    setTimeout(() => {
                         location.reload(); // Reload the page to reflect the changes
-                    } else {
-                        alert('Error: ' + data.error);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    alert('An error occurred while confirming the order: ' + error.message);
-                });
-        }
+                    }, 3000);
+                } else {
+                    showSuccess('Error: ' + data.error);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                showSuccess('An error occurred while confirming the order: ' + error.message);
+            });
     }
 </script>
 {% endblock %}
