@@ -1,93 +1,146 @@
 {% extends 'main.html' %}
-<!-- Extend main.html -->
 
 {% block content %}
 <div class="container mx-auto mt-8">
-    <h1 class="text-5xl font-bold mb-6">Transaksi</h1>
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-5xl font-bold">Transaksi</h1>
+        <!-- Success Message Box -->
+        <div id="successBox"
+            class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl w-1/3">
+            <p id="successMessage"></p>
+        </div>
+        <!-- Error Message Box -->
+        <div id="errorBox" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl w-1/3">
+            <p id="errorMessage"></p>
+        </div>
+    </div>
     <div class="bg-white rounded-lg shadow-md p-6">
-        <form id="transactionForm" method="POST" action="/save_transaction"
-            onsubmit="event.preventDefault(); submitTransaction();">
-            <!-- Ensure the action matches the route -->
-            <div class="mb-4">
-                <label for="item" class="block text-gray-700 text-sm font-bold mb-2">Barang:</label>
-                <select id="item" name="item" required class="border border-gray-300 rounded-md p-2 w-full">
-                    <option value="" disabled selected>Pilih Model</option>
-                    <option value="Sepeda Ontel A">Sepeda Ontel A</option>
-                    <option value="Sepeda Ontel B">Sepeda Ontel B</option>
-                    <option value="Sepeda Ontel C">Sepeda Ontel C</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
-                <input type="number" id="quantity" name="quantity" required
-                    class="border border-gray-300 rounded-md p-2 w-full">
-            </div>
-            <div class="mb-4">
-                <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Harga:</label>
-                <input type="number" id="price" name="price" required
-                    class="border border-gray-300 rounded-md p-2 w-full">
+        <form id="transactionForm" method="POST" onsubmit="event.preventDefault(); addToCart();">
+            <div class="flex space-x-2">
+                <div class="mb-4 w-2/5">
+                    <label for="item" class="block text-gray-700 text-sm font-bold mb-2">Barang:</label>
+                    <select id="item" name="item" required class="border border-gray-300 rounded-md p-2 w-full">
+                        <option value="" disabled selected>Pilih Model</option>
+                        <option value="Sepeda Ontel A">Sepeda Ontel A - Rp 1.000.000</option>
+                        <option value="Sepeda Ontel B">Sepeda Ontel B - Rp 1.500.000</option>
+                        <option value="Sepeda Ontel C">Sepeda Ontel C - Rp 2.000.000</option>
+                    </select>
+                </div>
+                <div class="mb-4 w-2/5">
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
+                    <input type="number" id="quantity" name="quantity" required
+                        class="border border-gray-300 rounded-md p-2 w-full">
+                </div>
             </div>
             <button type="submit"
                 class="bg-[#40DDC1] text-white rounded-md p-2 text-sm hover:bg-[#33b89d] transition duration-300 ease-in-out">
-                Simpan
+                Tambah
             </button>
         </form>
     </div>
 
-    <!-- Success Message Box -->
-    <div id="successBox"
-        class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl mt-5 w-full">
-        <p id="successMessage"></p>
+    <!-- Cart Section -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-4">
+        <h2 class="text-2xl font-bold mb-4">Keranjang Belanja</h2>
+        <div id="cartItems" class="">
+            <!-- Cart items will be displayed here -->
+        </div>
+        <button id="saveCart"
+            class="bg-[#40DDC1] text-white rounded-md p-2 text-sm hover:bg-[#33b89d] transition duration-300 ease-in-out mt-4"
+            onclick="saveCart()">
+            Simpan
+        </button>
     </div>
 </div>
 
 <script type="module">
-    // Import the necessary Firebase functions
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyD2dBzwq2uiCnASi3PTruIKJ-nBVzlaMsc",
-        authDomain: "iak-retail-kelompok-8.firebaseapp.com",
-        databaseURL: "https://iak-retail-kelompok-8-default-rtdb.firebaseio.com", // Add your database URL
-        projectId: "iak-retail-kelompok-8",
-        storageBucket: "iak-retail-kelompok-8.appspot.com",
-        messagingSenderId: "530693322081",
-        appId: "1:530693322081:web:270153437034677ad10120",
-        measurementId: "G-W6448PF8BE"
+    const cart = []; // Initialize an empty cart array
+    const prices = {
+        "Sepeda Ontel A": 1000000,
+        "Sepeda Ontel B": 1200000,
+        "Sepeda Ontel C": 1500000
     };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app); // Initialize Realtime Database
-
-    // Define the submitTransaction function in the global scope
-    window.submitTransaction = async function() {
+    // Function to add item to cart
+    window.addToCart = function() {
         const item = document.getElementById('item').value;
-        const quantity = parseInt(document.getElementById('quantity').value, 10); // Ensure quantity is an integer
-        const price = parseFloat(document.getElementById('price').value); // Ensure price is a float
+        const quantity = parseInt(document.getElementById('quantity').value, 10);
+        const price = prices[item];  // Get price based on selected item
+
+        const cartItem = { item, quantity, price }; // Price is now calculated based on the model
+
+        // Add item to cart
+        cart.push(cartItem);
+        displayCart();
+        document.getElementById('transactionForm').reset(); // Reset the form
+    };
+
+    // Function to display the cart items
+    function displayCart() {
+        const cartItemsDiv = document.getElementById('cartItems');
+        cartItemsDiv.innerHTML = ''; // Clear existing items
+
+        cart.forEach((cartItem, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex items-center mb-2';
+            itemDiv.innerHTML = `
+                <span class="flex-grow">${cartItem.item} - Jumlah: ${cartItem.quantity} - Total Harga: ${(cartItem.price * cartItem.quantity).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</span>
+                <button onclick="removeFromCart(${index})" class="ml-2 p-1 bg-[#DD406C] rounded-full">
+                    <img src="/static/svg/delete.svg" alt="Delete" width="24" height="24">
+                </button>
+            `;
+            cartItemsDiv.appendChild(itemDiv);
+        });
+    }
+
+    // Function to remove item from cart
+    window.removeFromCart = function(index) {
+        cart.splice(index, 1);
+        displayCart();
+    };
+
+    // Function to show a message box with a timeout
+    function showMessageBox(boxId, message, duration = 3000) {
+        const box = document.getElementById(boxId);
+        const messageElement = document.getElementById(boxId.replace('Box', 'Message'));
+        messageElement.textContent = message;
+        box.classList.remove('hidden');
+        
+        setTimeout(() => {
+            box.classList.add('hidden');
+        }, duration);
+    }
+
+       // Function to save cart
+       window.saveCart = async function() {
+        if (cart.length === 0) {
+            showMessageBox('errorBox', "Keranjang belanja kosong. Silakan tambahkan barang terlebih dahulu.");
+            return;
+        }
 
         try {
-            const newTransactionRef = ref(database, 'transactions/' + Date.now()); // Create a reference for the new transaction
-            await set(newTransactionRef, {
-                item: item,
-                quantity: quantity,
-                price: price
+            const response = await fetch('/save_transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(cart)
             });
 
-            // Show the success message box
-            const successBox = document.getElementById('successBox');
-            const successMessageElement = document.getElementById('successMessage');
-            successMessageElement.textContent = "Data transaksi berhasil disimpan.";
-            successBox.classList.remove('hidden'); // Show the success box
+            const data = await response.json();
 
-            // Reset the form after submission
-            document.getElementById('transactionForm').reset();
+            if (response.ok) {
+                showMessageBox('successBox', data.message);
+                // Clear cart after saving
+                cart.length = 0;
+                displayCart(); // Update cart display
+            } else {
+                showMessageBox('errorBox', data.error || "Terjadi kesalahan saat menyimpan data.");
+            }
         } catch (e) {
-            console.error("Error adding document: ", e);
-            alert("Terjadi kesalahan saat menyimpan data: " + e.message);
+            console.error("Error saving cart: ", e);
+            showMessageBox('errorBox', "Terjadi kesalahan saat menyimpan data: " + e.message);
         }
-    }
+    };
 </script>
 {% endblock %}

@@ -36,7 +36,7 @@
                     localStorage.setItem('registrationSuccess', 'Account successfully created!');
 
                     // Redirect to login page
-                    window.location.href = "/login"; // Adjust the redirect as necessary
+                    window.location.href = "/"; // Adjust the redirect as necessary
                 })
                 .catch((error) => {
                     const errorMessage = error.message;
@@ -62,7 +62,7 @@
 
         // Function to navigate to login page
         window.goToLogin = function () {
-            window.location.href = "/login"; // Adjust the redirect as necessary
+            window.location.href = "/"; // Adjust the redirect as necessary
         }
     </script>
 </head>
