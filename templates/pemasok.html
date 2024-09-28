@@ -38,7 +38,9 @@
                     </select>
                 </div>
                 <div class="w-full px-4">
-                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah: <span
+                            id="stockIndicator" class="text-gray-500">(Stok: <span
+                                id="currentStock">0</span>)</span></label>
                     <div class="flex items-center">
                         <button type="button" onclick="decrementQuantity()" class="text-gray-600 hover:text-gray-700
                             hover:bg-gray-300 h-full w-12 rounded-l-lg cursor-pointer outline-none">
@@ -376,5 +378,36 @@
             quantityInput.value = currentValue - 1;
         }
     }
+
+    // Function to update stock indicator
+    async function updateStockIndicator() {
+        const supplier = document.getElementById('supplier').value;
+        const product = document.getElementById('product').value;
+        if (supplier && product) {
+            try {
+                const response = await fetch('/api/get/supplier_stock', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        supplier,
+                        product
+                    })
+                });
+                const stockData = await response.json();
+                document.getElementById('currentStock').textContent = stockData.stock;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('currentStock').textContent = 'N/A';
+            }
+        } else {
+            document.getElementById('currentStock').textContent = '0';
+        }
+    }
+
+    // Add event listeners to update stock indicator
+    document.getElementById('supplier').addEventListener('change', updateStockIndicator);
+    document.getElementById('product').addEventListener('change', updateStockIndicator);
 </script>
 {% endblock %}
