@@ -24,19 +24,19 @@
 
     <!-- Transaction Table Container -->
     <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="overflow-x-auto">
-            <table class="table-auto w-full text-left border-collapse">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase border-b">ID</th>
-                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase border-b">Item</th>
-                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase border-b">Waktu</th>
-                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase border-b">Jumlah</th>
-                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase border-b">Harga</th>
-                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase border-b">Aksi</th>
+        <div class="overflow-x-auto shadow-md text-xs mb-5 rounded-lg">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600">
+                        <th class="text-left py-3 px-4 font-semibold border-b">ID</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Item</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Waktu</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Jumlah</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Harga</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="transactionTable" class="bg-white divide-y divide-gray-200">
+                <tbody id="transactionTable" class="bg-white">
                     <!-- Data will be dynamically populated here -->
                 </tbody>
             </table>
@@ -141,32 +141,32 @@
 
     // Display transactions for the current page
     function displayTransactions() {
-    const transactionTable = document.getElementById('transactionTable');
-    transactionTable.innerHTML = ''; // Clear the table
+        const transactionTable = document.getElementById('transactionTable');
+        transactionTable.innerHTML = ''; // Clear the table
 
-    const start = (currentPage - 1) * transactionsPerPage;
-    const end = start + transactionsPerPage;
-    const paginatedTransactions = transactions.slice(start, end);
+        const start = (currentPage - 1) * transactionsPerPage;
+        const end = start + transactionsPerPage;
+        const paginatedTransactions = transactions.slice(start, end);
 
-    paginatedTransactions.forEach(([id, transaction]) => {
-        const formattedPrice = formatRupiah(transaction.price); // Format the price
-        const row = `<tr>
-            <td class="border px-4 py-2">${transaction.transaction_id}</td>
-            <td class="border px-4 py-2">${transaction.item}</td>
-            <td class="border px-4 py-2">${transaction.date}</td>
-            <td class="border px-4 py-2">${transaction.quantity}</td>
-            <td class="border px-4 py-2">${formattedPrice}</td> <!-- Use formatted price -->
-            <td class="border px-4 py-2 text-center">
-                <button class="bg-[#DD406C] text-white p-2 rounded-md hover:bg-[#c2385d] transition duration-300 ease-in-out mt-2" onclick="openDeleteModal('${id}')">
-                    <img src="{{ url_for('static', filename='svg/delete.svg') }}" alt="Delete" class="w-6 h-6 inline">
-                </button>
-            </td>
-        </tr>`;
-        transactionTable.innerHTML += row;
-    });
+        paginatedTransactions.forEach(([id, transaction]) => {
+            const formattedPrice = formatRupiah(transaction.price); // Format the price
+            const row = `<tr>
+                <td class="py-3 px-4 border-b">${transaction.transaction_id}</td>
+                <td class="py-3 px-4 border-b">${transaction.item}</td>
+                <td class="py-3 px-4 border-b">${transaction.date}</td>
+                <td class="py-3 px-4 border-b">${transaction.quantity}</td>
+                <td class="py-3 px-4 border-b">${formattedPrice}</td>
+                <td class="py-3 px-4 border-b text-center">
+                    <button class="bg-[#DD406C] text-white p-2 rounded-md hover:bg-[#c2385d] transition duration-300 ease-in-out" onclick="openDeleteModal('${id}')">
+                        <img src="{{ url_for('static', filename='svg/delete.svg') }}" alt="Delete" class="w-6 h-6 inline">
+                    </button>
+                </td>
+            </tr>`;
+            transactionTable.innerHTML += row;
+        });
 
-    updatePaginationControls();
-}
+        updatePaginationControls();
+    }
 
     // Update pagination controls (next, prev buttons)
     function updatePaginationControls() {
