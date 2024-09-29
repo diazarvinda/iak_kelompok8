@@ -2,6 +2,7 @@ from flask import jsonify, request, flash, redirect, url_for
 from firebase_admin import db
 from datetime import datetime
 import uuid
+import requests
 
 class api_controller():
     def get_transactions_data(self):
@@ -57,88 +58,117 @@ class api_controller():
 
         return jsonify({"message": "Semua transaksi berhasil disimpan!"})
     
+    # Simulasi
+    # Simulasi
+    # Simulasi
     def get_supplier_stock(self):
-        data = request.get_json()
-        supplier = data['supplier']
-        product = data['product']
-        
-        # Fetch stock data from Firebase
-        stock_ref = db.reference(f'supplier_stock/{supplier}/{product}')
+        stock_ref = db.reference(f'suplier_product/')
         stock_data = stock_ref.get()
         
         if stock_data:
-            return jsonify({"stock": stock_data['stock'], "price": stock_data['price']})
+            return jsonify(stock_data)
         else:
             return jsonify({"error": "Stock data not found"}), 404
     
     def get_distributor_price(self):
         data = request.get_json()
-        distributor = data['distributor']
+        return jsonify(
+            {
+                'id_log': 36478,
+                'harga_pengiriman': 20000,
+                'lama_pengiriman': '3 hari',
+            }
+        )
+        # distributor = data['distributor']
         
-        # Fetch distributor price data from Firebase
-        price_ref = db.reference(f'distributor_prices/{distributor}')
-        price_data = price_ref.get()
+        # # Fetch distributor price data from Firebase
+        # price_ref = db.reference(f'distributor_prices/{distributor}')
+        # price_data = price_ref.get()
         
-        if price_data:
-            return jsonify({"price": price_data})
-        else:
-            return jsonify({"error": "Distributor price not found"}), 404
+        # if price_data:
+        #     return jsonify({
+        #         "price": price_data,
+
+        #     })
+        # else:
+        #     return jsonify({"error": "Distributor price not found"}), 404
     
     def submit_order(self):
         data = request.get_json()
-        cart = data['cart']
-        distributor = data['distributor']
+        print(data)
         
-        # Generate a unique order ID
-        order_id = str(uuid.uuid4())
-        
-        # Calculate total price and update stock
-        total_price = 0
-        stock_updates = {}
-        
-        for item in cart:
-            supplier = item['supplier']
-            product = item['product']
-            quantity = item['quantity']
-            
-            # Fetch current stock and price
-            stock_ref = db.reference(f'supplier_stock/{supplier}/{product}')
-            stock_data = stock_ref.get()
-            
-            if stock_data is None or stock_data['stock'] < quantity:
-                return jsonify({"error": f"Insufficient stock for {product}"}), 400
-            
-            price = stock_data['price']
-            total_price += price * quantity
-            
-            new_stock = stock_data['stock'] - quantity
-            stock_updates[f'supplier_stock/{supplier}/{product}/stock'] = new_stock
-        
-        # Fetch distributor price
-        distributor_price_ref = db.reference(f'distributor_prices/{distributor}')
-        distributor_price = distributor_price_ref.get()
-        
-        if distributor_price is None:
-            return jsonify({"error": "Distributor price not found"}), 404
-        
-        total_price += distributor_price
-        
-        # Save order data
-        order_data = {
-            'order_id': order_id,
-            'cart': cart,
-            'distributor': distributor,
-            'total_price': total_price,
-            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        # Update database
         try:
-            db.reference('orders').push(order_data)
-            db.reference().update(stock_updates)
-            return jsonify({"message": "Order submitted successfully"}), 200
+            response = requests.post('/place_order', json={'id_log': data['id_log']})
+            response_data = response.json()
+
+            if response.status_code != 200:
+                return jsonify({"error": response_data.get("error", "Failed to place order")}), response.status_code            
+            
+            no_resi = response_data['no_resi']
+
         except Exception as e:
-            return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
+            return jsonify({"error": f"Failed to place order: {str(e)}"}), 500
+
+
+        return jsonify({"message": "success"}), 200
+
+        
+        # # Generate a unique order ID
+        # order_id = str(uuid.uuid4())
+        
+        # # Calculate total price and update stock
+        # total_price = 0
+        # stock_updates = {}
+        
+        # for item in cart:
+        #     id_produk = item['id_produk']
+        #     quantity = item['quantity']
+            
+        #     # Map id_produk to supplier and product
+        #     product_type = 'Roda' if id_produk[0] == 'R' else 'Frame' if id_produk[0] == 'F' else 'Stang'
+        #     supplier = f'Toko {product_type}'
+        #     product = f'{product_type} {id_produk[1]}'
+            
+        #     # Fetch current stock and price
+        #     stock_ref = db.reference(f'supplier_stock/{supplier}/{product}')
+        #     stock_data = stock_ref.get()
+            
+        #     if stock_data is None or stock_data['stock'] < quantity:
+        #         return jsonify({"error": f"Insufficient stock for {product}"}), 400
+            
+        #     price = stock_data['price']
+        #     total_price += price * quantity
+            
+        #     new_stock = stock_data['stock'] - quantity
+        #     stock_updates[f'supplier_stock/{supplier}/{product}/stock'] = new_stock
+        
+        # # Fetch distributor price
+        # distributor_price_ref = db.reference(f'distributor_prices/{id_distributor}')
+        # distributor_price = distributor_price_ref.get()
+        
+        # if distributor_price is None:
+        #     return jsonify({"error": "Distributor price not found"}), 404
+        
+        # total_price += distributor_price
+        
+        # # Save order data
+        # order_data = {
+        #     'order_id': order_id,
+        #     'id_retail': id_retail,
+        #     'kota': kota,
+        #     'id_distributor': id_distributor,
+        #     'cart': cart,
+        #     'total_price': total_price,
+        #     'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # }
+        
+        # # Update database
+        # try:
+        #     db.reference('orders').push(order_data)
+        #     db.reference().update(stock_updates)
+        #     return jsonify({"message": "Order submitted successfully"}), 200
+        # except Exception as e:
+        #     return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
         
     def confirm_order(self, app):
         try:

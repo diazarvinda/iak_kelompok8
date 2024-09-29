@@ -82,22 +82,25 @@ def get_stock_data(): return api_controller().get_stock_data()
 @login_required
 def confirm_order(): return api_controller().confirm_order(app)
 
-@app.route('/api/submit_order', methods=['POST'])
-@login_required
-def submit_order(): return api_controller().submit_order()
-
 @app.route('/api/save_transaction', methods=['POST'])
 @login_required
 def save_transaction(): return api_controller().save_transaction()
+
+
+#simulasi
+#simulasi
+#simulasi
+@app.route('/api/get/supplier_stock', methods=['GET'])
+@login_required
+def get_supplier_stock(): return api_controller().get_supplier_stock()
 
 @app.route('/api/get/distributor_price', methods=['POST'])
 @login_required
 def get_distributor_price(): return api_controller().get_distributor_price()
 
-@app.route('/api/get/supplier_stock', methods=['POST'])
+@app.route('/api/submit_order', methods=['POST'])
 @login_required
-def get_supplier_stock(): return api_controller().get_supplier_stock()
-
+def submit_order(): return api_controller().submit_order()
 
 # Database init
 def initialize_database():
@@ -130,7 +133,7 @@ def initialize_database():
     db.reference('distributor_prices').set(distributor_prices)
 
 # Call this function once to initialize the database
-initialize_database()
+# initialize_database()
 
 if __name__ == '__main__':
     app.run(debug=True)  # Run the Flask application

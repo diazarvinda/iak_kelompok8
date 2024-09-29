@@ -17,6 +17,7 @@
 
     <!-- Section 1: Order Form -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+
         <form id="orderForm" method="POST" onsubmit="event.preventDefault(); addToCart();">
             <div class="flex flex-row space-x-8">
                 <div class="w-full px-4">
@@ -25,9 +26,9 @@
                         class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onchange="updateProductOptions()">
                         <option value="" disabled selected>Pilih Supplier</option>
-                        <option value="Toko Roda">Toko Roda</option>
-                        <option value="Toko Frame">Toko Frame</option>
-                        <option value="Toko Stang">Toko Stang</option>
+                        <option value="SUP01">Toko Roda</option>
+                        <option value="SUP02">Toko Frame</option>
+                        <option value="SUP03">Toko Sparepart</option>
                     </select>
                 </div>
                 <div class="w-full px-4">
@@ -38,9 +39,11 @@
                     </select>
                 </div>
                 <div class="w-full px-4">
-                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Jumlah: <span
-                            id="stockIndicator" class="text-gray-500">(Stok: <span
-                                id="currentStock">0</span>)</span></label>
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">
+                        Jumlah: <span id="stockIndicator" class="text-gray-500">
+                            (Stok: <span id="currentStock">0</span>)
+                        </span>
+                    </label>
                     <div class="flex items-center">
                         <button type="button" onclick="decrementQuantity()" class="text-gray-600 hover:text-gray-700
                             hover:bg-gray-300 h-full w-12 rounded-l-lg cursor-pointer outline-none">
@@ -91,9 +94,9 @@
                 <select id="distributor" name="distributor" required
                     class="border border-gray-300 rounded-md p-2 w-full">
                     <option value="" disabled selected>Pilih Distributor</option>
-                    <option value="Distributor A">Distributor A</option>
-                    <option value="Distributor B">Distributor B</option>
-                    <option value="Distributor C">Distributor C</option>
+                    <option value="DIS01">Distributor A</option>
+                    <option value="DIS02">Distributor B</option>
+                    <option value="DIS03">Distributor C</option>
                 </select>
             </div>
             <div class="w-1/3 pl-4 mt-5">
@@ -126,58 +129,43 @@
 
 <script>
     let cart = [];
-    const products = {
-        'Toko Roda': [{
-                name: 'Roda A',
-                price: 100000
-            },
-            {
-                name: 'Roda B',
-                price: 150000
-            },
-            {
-                name: 'Roda C',
-                price: 200000
-            }
-        ],
-        'Toko Frame': [{
-                name: 'Frame A',
-                price: 500000
-            },
-            {
-                name: 'Frame B',
-                price: 750000
-            },
-            {
-                name: 'Frame C',
-                price: 1000000
-            }
-        ],
-        'Toko Stang': [{
-                name: 'Stang A',
-                price: 200000
-            },
-            {
-                name: 'Stang B',
-                price: 300000
-            },
-            {
-                name: 'Stang C',
-                price: 400000
-            }
-        ]
-    };
+
+    const data_product = {};
+
+    let distributorData = {};
 
     function updateProductOptions() {
         const supplier = document.getElementById('supplier').value;
         const productSelect = document.getElementById('product');
+        const stockIndicator = document.getElementById('currentStock')
         productSelect.innerHTML = '<option value="" disabled selected>Pilih Barang</option>';
-        products[supplier].forEach(product => {
-            const option = document.createElement('option');
-            option.value = product.name;
-            option.textContent = `${product.name} - Rp ${product.price.toLocaleString()}`;
-            productSelect.appendChild(option);
-        });
+
+        supplier_api = {
+            'SUP01': 'api/get/supplier_stock',
+            'SUP02': 'api/get/supplier_stock',
+            'SUP03': 'api/get/supplier_stock'
+        }
+
+        fetch(supplier_api[supplier])
+            .then(response => response.json())
+            .then(data => {
+                Object.keys(data).forEach(key => {
+                    const product = data[key];
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = product.nama_produk;
+                    productSelect.appendChild(option);
+
+                    data_product[key] = product;
+                });
+
+                console.log(data_product);
+
+            })
+            .catch(error => {
+                console.error('Error fetching supplier data:', error);
+                showError('Failed to fetch supplier data. Please try again.');
+            });
     }
 
     async function addToCart() {
@@ -190,44 +178,32 @@
             return;
         }
 
-        try {
-            const response = await fetch('/api/get/supplier_stock', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    supplier,
-                    product
-                })
-            });
-            const stockData = await response.json();
-
-            if (quantity > stockData.stock) {
-                showError(`Stok tidak cukup. Tersedia: ${stockData.stock}`);
-                return;
-            }
-
-            const productData = products[supplier].find(p => p.name === product);
-            const existingItemIndex = cart.findIndex(item => item.product === product);
-
-            if (existingItemIndex !== -1) {
-                cart[existingItemIndex].quantity += quantity;
-            } else {
-                cart.push({
-                    supplier,
-                    product,
-                    quantity,
-                    price: productData.price
-                });
-            }
-
-            updateCartDisplay();
-            document.getElementById('orderForm').reset();
-        } catch (error) {
-            console.error('Error:', error);
-            showError('Terjadi kesalahan saat menambahkan item ke keranjang.');
+        if (quantity > data_product[product].stock) {
+            showError(`Stok tidak cukup. Tersedia: ${data_product[supplier].stock}`);
+            return;
         }
+
+        const productData = data_product[product];
+        const existingItemIndex = cart.findIndex(item => item.product === product);
+
+
+        if (existingItemIndex !== -1) {
+            cart[existingItemIndex].quantity += quantity;
+        } else {
+            cart.push({
+                supplier,
+                product,
+                quantity,
+                harga: productData.harga,
+                berat: productData.berat,
+                product_name: productData.nama_produk
+            });
+        }
+
+        console.log(cart);
+
+        updateCartDisplay();
+        document.getElementById('orderForm').reset();
     }
 
     function updateCartDisplay() {
@@ -246,8 +222,8 @@
             row.innerHTML = `
                 <td class="py-2 px-4 border-b">${item.product}</td>
                 <td class="py-2 px-4 border-b">${item.quantity}</td>
-                <td class="py-2 px-4 border-b">Rp ${item.price.toLocaleString()}</td>
-                <td class="py-2 px-4 border-b">Rp ${(item.price * item.quantity).toLocaleString()}</td>
+                <td class="py-2 px-4 border-b">Rp ${item.harga.toLocaleString()}</td>
+                <td class="py-2 px-4 border-b">Rp ${(item.harga * item.quantity).toLocaleString()}</td>
                 <td class="py-2 px-4 border-b">
                     <button onclick="removeFromCart(${index})" class="bg-[#DD406C] text-white p-2 rounded-md hover:bg-[#c2385d] transition duration-300 ease-in-out">
                         <img src="{{ url_for('static', filename='svg/delete.svg') }}" alt="Delete" class="w-6 h-6 inline">
@@ -298,6 +274,9 @@
     }
 
     async function displayCheckoutModal(distributor) {
+        let totalPrice = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
+        let totalWeight = cart.reduce((sum, item) => sum + item.berat * item.quantity, 0);
+
         try {
             const response = await fetch('/api/get/distributor_price', {
                 method: 'POST',
@@ -305,19 +284,26 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    distributor
+                    'cart': cart.map(item => ({
+                        'id_produk': item.product,
+                        'quantity': item.quantity
+                    })),
+                    'id_retail': 'RET02',
+                    'id_distributor': distributor,
+                    'total_harga_barang': totalPrice,
+                    'total_berat_barang': totalWeight,
+                    'kota_tujuan': 'ngawi'
                 })
             });
-            const distributorData = await response.json();
 
-            let totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            let shippingCost = distributorData.price;
-            let grandTotal = totalPrice + shippingCost;
+            distributorData = await response.json();
 
+            console.log(distributorData);
+            const grandTotal = totalPrice + distributorData['harga_pengiriman'];
             const orderDetails = document.getElementById('orderDetails');
             orderDetails.innerHTML = `
                 <p>Total Harga: Rp ${totalPrice.toLocaleString()}</p>
-                <p>Biaya Pengiriman (${distributor}): Rp ${shippingCost.toLocaleString()}</p>
+                <p>Biaya Pengiriman (${distributor}): Rp ${distributorData['harga_pengiriman'].toLocaleString()}</p>
                 <p>Total Keseluruhan: Rp ${grandTotal.toLocaleString()}</p>
             `;
 
@@ -338,6 +324,8 @@
 
     async function submitOrder() {
         const distributor = document.getElementById('distributor').value;
+        let totalPrice = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
+
         try {
             const response = await fetch('/api/submit_order', {
                 method: 'POST',
@@ -345,13 +333,16 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    'id_log': distributorData['id_log'],
                     cart,
+                    'total_price': totalPrice + distributorData['harga_pengiriman'],
                     distributor
                 })
             });
             const result = await response.json();
             if (response.ok) {
                 showSuccess(result.message);
+                distributorData = {};
                 cart = [];
                 updateCartDisplay();
                 closeModal();
@@ -383,24 +374,9 @@
     async function updateStockIndicator() {
         const supplier = document.getElementById('supplier').value;
         const product = document.getElementById('product').value;
+
         if (supplier && product) {
-            try {
-                const response = await fetch('/api/get/supplier_stock', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        supplier,
-                        product
-                    })
-                });
-                const stockData = await response.json();
-                document.getElementById('currentStock').textContent = stockData.stock;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('currentStock').textContent = 'N/A';
-            }
+            document.getElementById('currentStock').textContent = data_product[product].stock;
         } else {
             document.getElementById('currentStock').textContent = '0';
         }
