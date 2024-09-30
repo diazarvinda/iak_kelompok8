@@ -5,15 +5,12 @@ import uuid
 import requests
 
 class api_controller():
+
+    #Transaksi (Internal)
     def get_transactions_data(self):
         transactions_ref = db.reference('transactions')
         transactions = transactions_ref.get()
         return jsonify(transactions)
-    
-    def get_stock_data(self):
-        stock_ref = db.reference('stock')
-        stock = stock_ref.get()
-        return jsonify(stock)
     
     def save_transaction(self):
         cart_items = request.get_json()
@@ -58,8 +55,15 @@ class api_controller():
 
         return jsonify({"message": "Semua transaksi berhasil disimpan!"})
     
+    
+    # Gudang
+    def get_stock_data(self):
+        stock_ref = db.reference('stock')
+        stock = stock_ref.get()
+        return jsonify(stock)
+    
 
-    # Simulasi
+    # Data Supplier
     def get_supplier_stock(self, supplier):
 
         if supplier == 'SUP01':
@@ -89,6 +93,8 @@ class api_controller():
         else:
             return jsonify({"error": "Stock data not found"}), 404
     
+
+    # Data harga ongkir
     def get_distributor_price(self):
         data = request.get_json()
         data_post = data.copy()
@@ -119,6 +125,8 @@ class api_controller():
 
         return jsonify(distributor_data), 200
     
+
+    # Submit Order
     def submit_order(self):
         data = request.get_json()
         data_post = {'id_log': data['id_log']}
@@ -130,6 +138,18 @@ class api_controller():
                 print(response_data)
             except Exception as e:
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500    
+        elif data['id_supplier'] == 'SUP02':
+            try:
+                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
+                response_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
+        elif data['id_supplier'] == 'SUP03':
+            try:
+                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
+                response_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
 
         # Save order data
         order_data = {
@@ -149,6 +169,7 @@ class api_controller():
         except Exception as e:
             return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
         
+    # Track Order
     def track_order(self):
         data = request.get_json()
         print(data)
@@ -181,52 +202,23 @@ class api_controller():
             return jsonify({"error": "Supplier tidak dikenali"}), 400
 
         distributor_data['no_resi'] = data['no_resi']
+        distributor_data['status'] = "Arrived"
         return jsonify(distributor_data), 200
 
+    def get_data_pemesanan(self):
+        # Fetch orders from Firebase
+        orders_ref = db.reference('orders')
+        orders = orders_ref.get()
+
+        return jsonify(orders), 200
+
+    # Konfirmasi Pesanan
+    def confirm_order(self):
+        data = request.get_json()
+        print(data)
+
         
-    def confirm_order(self, app):
-        try:
-            data = request.get_json()
-            order_id = data['order_id']
-            
-            # Fetch the order from Firebase
-            orders_ref = db.reference('orders')
-            order = orders_ref.child(order_id).get()
-            
-            if not order:
-                return jsonify({"error": "Order not found"}), 404
-            
-            # Update stock for each item in the order
-            stock_ref = db.reference('stock')
-            stock_data = stock_ref.get()
-            
-            if stock_data is None:
-                stock_data = []
-            
-            stock_dict = {item['nama_produk']: item for item in stock_data}
-            
-            for item in order['cart']:
-                product = item['product']
-                quantity = item['quantity']
-                
-                # Update stock
-                if product in stock_dict:
-                    stock_dict[product]['stock'] += quantity
-                else:
-                    # If the product doesn't exist in stock, create a new entry
-                    stock_dict[product] = {
-                        'id_produk': product[:2].upper(),
-                        'nama_produk': product,
-                        'stock': quantity
-                    }
-            
-            # Update the stock in Firebase
-            stock_ref.set([stock_dict[key] for key in stock_dict])
-            
-            # Remove the order from the 'orders' node
-            orders_ref.child(order_id).delete()
-            
-            return jsonify({"message": "Order confirmed and stock updated successfully"}), 200
-        except Exception as e:
-            app.logger.error(f"Error in confirm_order: {str(e)}")
-            return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        # Menambah Data di Inventaris
+        # db.reference('inventaris').push(data)
+
+        # db.reference('orders').child(data['no_resi']).delete()

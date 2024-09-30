@@ -137,7 +137,6 @@
     function updateProductOptions() {
         const supplier = document.getElementById('supplier').value;
         const productSelect = document.getElementById('product');
-        const stockIndicator = document.getElementById('currentStock')
         productSelect.innerHTML = '<option value="" disabled selected>Pilih Barang</option>';
 
         fetch(`/api/get/supplier_stock/${supplier}`)
@@ -146,7 +145,7 @@
                 Object.keys(data).forEach(key => {
                     const product = data[key];
                     const option = document.createElement('option');
-                    option.value = key;
+                    option.value = product.id_produk;
                     option.textContent = product.nama_produk;
                     productSelect.appendChild(option);
 
@@ -170,20 +169,34 @@
             return;
         }
 
-        if (quantity > data_product[product].stock) {
-            showError(`Stok tidak cukup. Tersedia: ${data_product[product].stock}`);
+        for (const Id in data_product) {
+            if (data_product.hasOwnProperty(Id) && data_product[Id].id_produk === product) {
+                data_stock = data_product[Id].stock; // Tetapkan data_confirm ke objek order jika no_resi cocok
+                break; // Keluar dari loop setelah menemukan data yang cocok
+            }
+        }
+
+        if (quantity > data_stock) {
+            showError(`Stok tidak cukup. Tersedia: ${data_stock}`);
             return;
         }
 
         const existingItemIndex = cart.findIndex(item => item.product === product);
         const existingQuantity = existingItemIndex !== -1 ? cart[existingItemIndex].quantity : 0;
 
-        if (quantity + existingQuantity > data_product[product].stock) {
-            showError(`Stok tidak cukup. Tersedia: ${data_product[product].stock - existingQuantity}`);
+        if (quantity + existingQuantity > data_stock) {
+            showError(`Stok tidak cukup. Tersedia: ${data_stock - existingQuantity}`);
             return;
         }
 
-        const productData = data_product[product];
+        let data_confirm = null; // Inisialisasi data_confirm sebagai null
+        for (const orderId in data_product) {
+            if (data_product.hasOwnProperty(orderId) && data_product[orderId].id_produk === product) {
+                data_confirm = data_product[orderId]; // Tetapkan data_confirm ke objek order jika no_resi cocok
+                break; // Keluar dari loop setelah menemukan data yang cocok
+            }
+        }
+        const productData = data_confirm;
 
         if (existingItemIndex !== -1) {
             cart[existingItemIndex].quantity += quantity;
@@ -297,6 +310,7 @@
             });
 
             distributorData = await response.json();
+            console.log(distributorData);
 
             const grandTotal = totalPrice + distributorData['harga_pengiriman'];
             const orderDetails = document.getElementById('orderDetails');
@@ -375,9 +389,18 @@
     async function updateStockIndicator() {
         const supplier = document.getElementById('supplier').value;
         const product = document.getElementById('product').value;
+        console.log(data_product);
 
         if (supplier && product) {
-            document.getElementById('currentStock').textContent = data_product[product].stock;
+            let data_confirm = null; // Inisialisasi data_confirm sebagai null
+            for (const Id in data_product) {
+                if (data_product.hasOwnProperty(Id) && data_product[Id].id_produk === product) {
+                    data_stock = data_product[Id].stock; // Tetapkan data_confirm ke objek order jika no_resi cocok
+                    break; // Keluar dari loop setelah menemukan data yang cocok
+                }
+            }
+            // document.getElementById('currentStock').textContent = data_product[product] ? data_product[product].stock : '0';
+            document.getElementById('currentStock').textContent = data_stock;
         } else {
             document.getElementById('currentStock').textContent = '0';
         }

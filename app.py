@@ -87,11 +87,15 @@ def get_stock_data(): return api_controller().get_stock_data()
 # API untuk konfirmasi barang sudah sampai (distributor)
 @app.route('/api/confirm_order', methods=['POST'])
 @login_required
-def confirm_order(): return api_controller().confirm_order(app)
+def confirm_order(): return api_controller().confirm_order()
 
 @app.route('/api/track/order', methods=['POST'])
 @login_required
 def track_order(): return api_controller().track_order()
+
+@app.route('/api/get/pemesanan', methods=['GET'])
+@login_required
+def get_data_pemesanan(): return api_controller().get_data_pemesanan()
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -108,38 +112,7 @@ def get_distributor_price(): return api_controller().get_distributor_price()
 @login_required
 def submit_order(): return api_controller().submit_order()
 
-# # Database init
-# def initialize_database():
-#     # Initialize supplier stock
-#     supplier_stock = {
-#         "Toko Roda": {
-#             "Roda A": {"price": 100000, "stock": 50},
-#             "Roda B": {"price": 150000, "stock": 40},
-#             "Roda C": {"price": 200000, "stock": 30}
-#         },
-#         "Toko Frame": {
-#             "Frame A": {"price": 500000, "stock": 25},
-#             "Frame B": {"price": 750000, "stock": 20},
-#             "Frame C": {"price": 1000000, "stock": 15}
-#         },
-#         "Toko Stang": {
-#             "Stang A": {"price": 200000, "stock": 35},
-#             "Stang B": {"price": 300000, "stock": 30},
-#             "Stang C": {"price": 400000, "stock": 25}
-#         }
-#     }
-#     db.reference('supplier_stock').set(supplier_stock)
 
-#     # Initialize distributor prices
-#     distributor_prices = {
-#         "Distributor A": 50000,
-#         "Distributor B": 75000,
-#         "Distributor C": 100000
-#     }
-#     db.reference('distributor_prices').set(distributor_prices)
-
-# Call this function once to initialize the database
-# initialize_database()
 
 if __name__ == '__main__':
     app.run(debug=True)  # Run the Flask application
