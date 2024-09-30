@@ -8,22 +8,20 @@
 - 164221079 | Patricia Dewinta Wahyu Krisnayanti
 
 ## Deskripsi Umum
-Modul **Retail** bertanggung jawab untuk mengelola transaksi dan pemesanan produk yang dilakukan oleh toko (retail) kepada supplier. Sistem ini melibatkan proses login, manajemen keranjang belanja, pemesanan barang dari pemasok, dan pelacakan status pesanan. Sistem berinteraksi dengan modul **Supplier** dan **Distributor** melalui RESTful API.
+Modul **Retail** bertanggung jawab untuk mengelola transaksi dan pemesanan produk yang dilakukan oleh toko (retail) kepada supplier. Sistem ini melibatkan proses login, manajemen keranjang belanja, pemesanan barang dari pemasok, dan pelacakan status pesanan. Sistem berinteraksi dengan Modul **Supplier** dan **Distributor** melalui RESTful API.
 
 ---
 
 ## Fitur dan Endpoint API yang Tersedia
 
-### Dokumentasi API
-
-#### Overview
+### Overview
 API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan lainnya. Dibangun menggunakan Flask dan terintegrasi dengan Firebase untuk penyimpanan data.
 
-#### Endpoints:
+### Endpoints:
 
-#### 1. User Authentication
+### 1. User Authentication
 
-#### Login
+#### a. Login
 - **URL:** `/`
 - **Method:** `GET`, `POST`
 - **Deskripsi:** Menampilkan halaman login dan menangani login pengguna.
@@ -32,7 +30,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   GET /
   ```
 
-### Register
+#### b. Register
 - **URL:** `/register`
 - **Method:** `GET`, `POST`
 - **Deskripsi:** Menampilkan halaman registrasi dan menangani pendaftaran pengguna.
@@ -44,7 +42,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   email=user@example.com&password=securepassword
   ```
 
-### Logout
+#### c. Logout
 - **URL:** `/logout`
 - **Method:** `GET`
 - **Deskripsi:** Logout pengguna dan menghapus sesi.
@@ -55,7 +53,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
 
 ### 2. Transactions
 
-### Get Transactions Data
+#### a. Get Transactions Data
 - **URL:** `/api/get/transaction_data`
 - **Method:** `GET`
 - **Deskripsi:** Mengambil semua data transaksi.
@@ -82,7 +80,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
     }
   ```
 
-### Save Transaction
+#### b. Save Transaction
 - **URL:** `/api/save_transaction`
 - **Method:** `POST`
 - **Deskripsi:** Menyimpan transaksi baru.
@@ -106,7 +104,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
 
 ### 3. Stock Data
 
-### Get Stock Data
+#### a. Get Stock Data
 - **URL:** `/api/get/stock_data`
 - **Method:** `GET`
 - **Deskripsi:** Mengambil semua data stok.
@@ -122,7 +120,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   }
   ```
 
-### Get Supplier Stock
+#### b. Get Supplier Stock
 - **URL:** `/api/get/supplier_stock/<supplier>`
 - **Method:** `GET`
 - **Deskripsi:** Mengambil data stok dari supplier tertentu.
@@ -144,7 +142,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
 
 ### 4. Orders
 
-### Get Distributor Price
+#### a. Get Distributor Price
 - **URL:** `/api/get/distributor_price`
 - **Method:** `POST`
 - **Deskripsi:** Mengambil harga dari distributor.
@@ -174,12 +172,12 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   ```json
     {
     "harga_pengiriman": 50000,  
-    "lama_pengiriman": "3 hari",  
+    "lama_pengiriman": "3-5 hari", 
     "transaction_id": "123e4567-e89b-12d3-a456-426614174000"  
     }
   ```
 
-### Submit Order
+#### b. Submit Order
 - **URL:** `/api/submit_order`
 - **Method:** `POST`
 - **Deskripsi:** Mengirimkan pesanan baru.
@@ -188,9 +186,9 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   POST /api/submit_order
 
   {
-        "id_supplier": "SUP01",  
-        "id_log": "123e4567-e89b-12d3-a456-426614174000", 
-        "id_distributor": "DIS01", 
+        "id_supplier": "SUP01",
+        "id_log": "123e4567-e89b-12d3-a456-426614174000",  
+        "id_distributor": "DIS01",  
         "total_price": 550000,  
         "cart": [
             {
@@ -219,7 +217,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   }
   ```
 
-### Track Order
+#### c. Track Order
 - **URL:** `/api/track/order`
 - **Method:** `POST`
 - **Deskripsi:** Melacak pesanan yang ada.
@@ -240,7 +238,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   }
   ```
 
-### Confirm Order
+#### d. Confirm Order
 - **URL:** `/api/confirm_order`
 - **Method:** `POST`
 - **Deskripsi:** Mengonfirmasi pesanan dan memperbarui data stok.
@@ -263,7 +261,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   }
   ```
 
-### Get Data Pemesanan
+#### e. Get Data Pemesanan
 - **URL:** `/api/get/pemesanan`
 - **Method:** `GET`
 - **Deskripsi:** Mengambil semua data pemesanan.
@@ -286,8 +284,16 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   }
   ```
 
-### Teknologi yang Digunakan
-- Backend: Python (Flask)
-- Database: Firebase
-- Frontend: HTML, CSS, JavaScript
-- Integrasi API: RESTful API
+## Teknologi yang Digunakan
+- **Backend**: Python (Flask)
+- **Database**: Firebase
+- **Frontend**: HTML, CSS, JavaScript
+- **API Integrasi**: RESTful API
+
+## Cara Kerja Modul dan Interaksi dengan Modul Lain
+- Modul Retail akan mengambil data transaksi yang telah dilakukan menggunakan **GET /api/get/transaction_data**.
+- Kemudian transaksi disimpan ke dalam histori transaksi menggunakan **POST /api/save_transaction**.
+- Modul Retail akan bisa mendapatkan informasi produk dari Modul Supplier menggunakan **GET /api/get/supplier_stock/<supplier>**.
+- Setelah memilih produk, Retail melakukan order kepada Supplier menggunakan **POST /api/submit_order**.
+- Supplier memproses pesanan dan mengirimkan informasi terkait harga pengiriman dari Distributor ke Retail menggunakan **GET /api/get/distributor_price**.
+- Retail akan mendapatkan detail pengiriman dan dapat melacak pengiriman melalui nomor resi menggunakan **POST /api/track/order**.
