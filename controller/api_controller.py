@@ -91,132 +91,63 @@ class api_controller():
     
     def get_distributor_price(self):
         data = request.get_json()
-        print(data['id_supplier'])
+        data_post = data.copy()
+        del data_post['id_supplier']
 
 
         if data['id_supplier'] == 'SUP01':
             try:
-                response = requests.get('http://167.99.238.114:8000/api/hehe')
+                response = requests.post('http://167.99.238.114:8000/check_price', json=data_post)
                 distributor_data = response.json()
+                print(distributor_data)
             except Exception as e:
-                return jsonify({"error": f"Failed to fetch distributor data: {str(e)}"}), 500
+                return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP02':
             try:
-                response = requests.get('http://167.99.238.114:8000/api/hehe')
+                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
                 distributor_data = response.json()
             except Exception as e:
-                return jsonify({"error": f"Failed to fetch distributor data: {str(e)}"}), 500
+                return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP03':
             try:
-                response = requests.get('http://167.99.238.114:8000/api/hehe')
+                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
                 distributor_data = response.json()
             except Exception as e:
-                return jsonify({"error": f"Failed to fetch distributor data: {str(e)}"}), 500
+                return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         else:
-            return jsonify({"error": "Supplier not recognized"}), 400
+            return jsonify({"error": "Supplier tidak dikenali"}), 400
 
         return jsonify(distributor_data), 200
-
-
-
-
-        # return jsonify(
-        #     {
-        #         'id_log': 36478,
-        #         'harga_pengiriman': 20000,
-        #         'lama_pengiriman': '3 hari',
-        #     }
-        # )
-        # distributor = data['distributor']
-        
-        # # Fetch distributor price data from Firebase
-        # price_ref = db.reference(f'distributor_prices/{distributor}')
-        # price_data = price_ref.get()
-        
-        # if price_data:
-        #     return jsonify({
-        #         "price": price_data,
-
-        #     })
-        # else:
-        #     return jsonify({"error": "Distributor price not found"}), 404
     
     def submit_order(self):
         data = request.get_json()
-        print(data)
+        data_post = {'id_log': data['id_log']}
         
+        if data['id_supplier'] == 'SUP01':
+            try:
+                response = requests.post('http://167.99.238.114:8000/place_order', json=data_post)
+                response_data = response.json()
+                print(response_data)
+            except Exception as e:
+                return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500    
+
+        # Save order data
+        order_data = {
+            'no_resi': response_data['no_resi'],
+            'id_distributor': data['distributor'],
+            'lama pengiriman': response_data['lama_pengiriman'], 
+            'harga_pengiriman': response_data['harga_pengiriman'],
+            'cart': data['cart'],
+            'total_price': data['total_price'],
+            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Update database
         try:
-            response = requests.post('/place_order', json={'id_log': data['id_log']})
-            response_data = response.json()
-
-            if response.status_code != 200:
-                return jsonify({"error": response_data.get("error", "Failed to place order")}), response.status_code            
-            
-            no_resi = response_data['no_resi']
-
+            db.reference('orders').push(order_data)
+            return jsonify({"message": "Order submitted successfully"}), 200
         except Exception as e:
-            return jsonify({"error": f"Failed to place order: {str(e)}"}), 500
-
-
-        return jsonify({"message": "success"}), 200
-
-        
-        # # Generate a unique order ID
-        # order_id = str(uuid.uuid4())
-        
-        # # Calculate total price and update stock
-        # total_price = 0
-        # stock_updates = {}
-        
-        # for item in cart:
-        #     id_produk = item['id_produk']
-        #     quantity = item['quantity']
-            
-        #     # Map id_produk to supplier and product
-        #     product_type = 'Roda' if id_produk[0] == 'R' else 'Frame' if id_produk[0] == 'F' else 'Stang'
-        #     supplier = f'Toko {product_type}'
-        #     product = f'{product_type} {id_produk[1]}'
-            
-        #     # Fetch current stock and price
-        #     stock_ref = db.reference(f'supplier_stock/{supplier}/{product}')
-        #     stock_data = stock_ref.get()
-            
-        #     if stock_data is None or stock_data['stock'] < quantity:
-        #         return jsonify({"error": f"Insufficient stock for {product}"}), 400
-            
-        #     price = stock_data['price']
-        #     total_price += price * quantity
-            
-        #     new_stock = stock_data['stock'] - quantity
-        #     stock_updates[f'supplier_stock/{supplier}/{product}/stock'] = new_stock
-        
-        # # Fetch distributor price
-        # distributor_price_ref = db.reference(f'distributor_prices/{id_distributor}')
-        # distributor_price = distributor_price_ref.get()
-        
-        # if distributor_price is None:
-        #     return jsonify({"error": "Distributor price not found"}), 404
-        
-        # total_price += distributor_price
-        
-        # # Save order data
-        # order_data = {
-        #     'order_id': order_id,
-        #     'id_retail': id_retail,
-        #     'kota': kota,
-        #     'id_distributor': id_distributor,
-        #     'cart': cart,
-        #     'total_price': total_price,
-        #     'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # }
-        
-        # # Update database
-        # try:
-        #     db.reference('orders').push(order_data)
-        #     db.reference().update(stock_updates)
-        #     return jsonify({"message": "Order submitted successfully"}), 200
-        # except Exception as e:
-        #     return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
+            return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
         
     def confirm_order(self, app):
         try:

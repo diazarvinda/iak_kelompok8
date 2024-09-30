@@ -153,8 +153,6 @@
                     data_product[key] = product;
                 });
 
-                console.log(data_product);
-
             })
             .catch(error => {
                 console.error('Error fetching supplier data:', error);
@@ -193,8 +191,6 @@
                 product_name: productData.nama_produk
             });
         }
-
-        console.log(cart);
 
         updateCartDisplay();
         document.getElementById('orderForm').reset();
@@ -294,7 +290,6 @@
 
             distributorData = await response.json();
 
-            console.log(distributorData);
             const grandTotal = totalPrice + distributorData['harga_pengiriman'];
             const orderDetails = document.getElementById('orderDetails');
             orderDetails.innerHTML = `
@@ -330,10 +325,11 @@
                 },
                 body: JSON.stringify({
                     'id_supplier': cart[0].supplier,
-                    'id_log': distributorData['id_log'],
-                    cart,
+                    'id_log': distributorData['transaction_id'],
+                    distributor,
                     'total_price': totalPrice + distributorData['harga_pengiriman'],
-                    distributor
+                    cart
+                    
                 })
             });
             const result = await response.json();
