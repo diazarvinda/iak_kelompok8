@@ -58,12 +58,31 @@ class api_controller():
 
         return jsonify({"message": "Semua transaksi berhasil disimpan!"})
     
+
     # Simulasi
-    # Simulasi
-    # Simulasi
-    def get_supplier_stock(self):
-        stock_ref = db.reference(f'suplier_product/')
-        stock_data = stock_ref.get()
+    def get_supplier_stock(self, supplier):
+
+        if supplier == 'SUP01':
+            try:
+                response = requests.get('http://167.99.238.114:8000/products')
+                stock_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
+        elif supplier == 'SUP02':
+            try:
+                response = requests.get('http://167.99.238.114:8000/products')
+                stock_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
+        elif supplier == 'SUP03':
+            try:
+                response = requests.get('http://167.99.238.114:8000/products')
+                stock_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
+        else:
+            return jsonify({"error": "Supplier not recognized"}), 400
+
         
         if stock_data:
             return jsonify(stock_data)
@@ -72,13 +91,42 @@ class api_controller():
     
     def get_distributor_price(self):
         data = request.get_json()
-        return jsonify(
-            {
-                'id_log': 36478,
-                'harga_pengiriman': 20000,
-                'lama_pengiriman': '3 hari',
-            }
-        )
+        print(data['id_supplier'])
+
+
+        if data['id_supplier'] == 'SUP01':
+            try:
+                response = requests.get('http://167.99.238.114:8000/api/hehe')
+                distributor_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Failed to fetch distributor data: {str(e)}"}), 500
+        elif data['id_supplier'] == 'SUP02':
+            try:
+                response = requests.get('http://167.99.238.114:8000/api/hehe')
+                distributor_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Failed to fetch distributor data: {str(e)}"}), 500
+        elif data['id_supplier'] == 'SUP03':
+            try:
+                response = requests.get('http://167.99.238.114:8000/api/hehe')
+                distributor_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Failed to fetch distributor data: {str(e)}"}), 500
+        else:
+            return jsonify({"error": "Supplier not recognized"}), 400
+
+        return jsonify(distributor_data), 200
+
+
+
+
+        # return jsonify(
+        #     {
+        #         'id_log': 36478,
+        #         'harga_pengiriman': 20000,
+        #         'lama_pengiriman': '3 hari',
+        #     }
+        # )
         # distributor = data['distributor']
         
         # # Fetch distributor price data from Firebase

@@ -100,7 +100,7 @@
                 </select>
             </div>
             <div class="w-1/3 pl-4 mt-5">
-                <button onclick="checkout()"
+                <button onclick="event.preventDefault(); checkout()"
                     class="bg-[#40DDC1] text-white rounded-md py-2 px-4 w-full text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]">
                     Checkout
                 </button>
@@ -140,13 +140,7 @@
         const stockIndicator = document.getElementById('currentStock')
         productSelect.innerHTML = '<option value="" disabled selected>Pilih Barang</option>';
 
-        supplier_api = {
-            'SUP01': 'api/get/supplier_stock',
-            'SUP02': 'api/get/supplier_stock',
-            'SUP03': 'api/get/supplier_stock'
-        }
-
-        fetch(supplier_api[supplier])
+        fetch(`/api/get/supplier_stock/${supplier}`)
             .then(response => response.json())
             .then(data => {
                 Object.keys(data).forEach(key => {
@@ -273,17 +267,19 @@
         displayCheckoutModal(distributor);
     }
 
-    async function displayCheckoutModal(distributor) {
+    async function displayCheckoutModal(distributor,) {
         let totalPrice = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
         let totalWeight = cart.reduce((sum, item) => sum + item.berat * item.quantity, 0);
+        const supplier = cart[0].supplier;
 
         try {
             const response = await fetch('/api/get/distributor_price', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    'id_supplier': supplier,
                     'cart': cart.map(item => ({
                         'id_produk': item.product,
                         'quantity': item.quantity
@@ -333,6 +329,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    'id_supplier': cart[0].supplier,
                     'id_log': distributorData['id_log'],
                     cart,
                     'total_price': totalPrice + distributorData['harga_pengiriman'],

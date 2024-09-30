@@ -1,13 +1,14 @@
 from flask import Flask, redirect, url_for, flash, session
+from flask_cors import CORS  # Menambahkan import CORS
 from functools import wraps
 import firebase_admin
 from firebase_admin import credentials, db
 from controller.main_controller import main_controller
 from controller.api_controller import api_controller
 
-
 app = Flask(__name__)
 app.secret_key = '1234' 
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate('config/iak-retail-kelompok-8-firebase-adminsdk-3jgwz-e3f029a870.json')  # Path to your service account key
@@ -43,7 +44,7 @@ def register(): return main_controller().register()
 @login_required
 def about():return main_controller().about()
 
-@app.route('/pembayaran')
+@app.route('/pembayaran')  # Mengaktifkan CORS untuk aplikasi
 @login_required
 def pembayaran():return main_controller().pembayaran()
 
@@ -88,11 +89,9 @@ def save_transaction(): return api_controller().save_transaction()
 
 
 #simulasi
-#simulasi
-#simulasi
-@app.route('/api/get/supplier_stock', methods=['GET'])
+@app.route('/api/get/supplier_stock/<supplier>', methods=['GET'])
 @login_required
-def get_supplier_stock(): return api_controller().get_supplier_stock()
+def get_supplier_stock(supplier): return api_controller().get_supplier_stock(supplier)
 
 @app.route('/api/get/distributor_price', methods=['POST'])
 @login_required
