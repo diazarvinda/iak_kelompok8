@@ -58,14 +58,12 @@ class api_controller():
     
     # Gudang
     def get_stock_data(self):
-        stock_ref = db.reference('stock')
+        stock_ref = db.reference('inventaris')
         stock = stock_ref.get()
         return jsonify(stock)
     
-
     # Data Supplier
     def get_supplier_stock(self, supplier):
-
         if supplier == 'SUP01':
             try:
                 response = requests.get('http://167.99.238.114:8000/products')
@@ -74,7 +72,7 @@ class api_controller():
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
         elif supplier == 'SUP02':
             try:
-                response = requests.get('http://167.99.238.114:8000/products')
+                response = requests.get('https://suplierman.pythonanywhere.com/products/api/products')
                 stock_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
@@ -110,8 +108,9 @@ class api_controller():
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP02':
             try:
-                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
+                response = requests.post('https://suplierman.pythonanywhere.com/api/distributor/cek_harga', json=data_post)
                 distributor_data = response.json()
+                print(distributor_data)
             except Exception as e:
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP03':

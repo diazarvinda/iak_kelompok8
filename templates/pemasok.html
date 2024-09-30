@@ -170,7 +170,7 @@
         }
 
         for (const Id in data_product) {
-            if (data_product.hasOwnProperty(Id) && data_product[Id].id_produk === product) {
+            if (data_product.hasOwnProperty(Id) && data_product[Id].id_produk == product) {
                 data_stock = data_product[Id].stock; // Tetapkan data_confirm ke objek order jika no_resi cocok
                 break; // Keluar dari loop setelah menemukan data yang cocok
             }
@@ -191,7 +191,7 @@
 
         let data_confirm = null; // Inisialisasi data_confirm sebagai null
         for (const orderId in data_product) {
-            if (data_product.hasOwnProperty(orderId) && data_product[orderId].id_produk === product) {
+            if (data_product.hasOwnProperty(orderId) && data_product[orderId].id_produk == product) {
                 data_confirm = data_product[orderId]; // Tetapkan data_confirm ke objek order jika no_resi cocok
                 break; // Keluar dari loop setelah menemukan data yang cocok
             }
@@ -390,11 +390,12 @@
         const supplier = document.getElementById('supplier').value;
         const product = document.getElementById('product').value;
         console.log(data_product);
+        console.log(product);
 
         if (supplier && product) {
             let data_confirm = null; // Inisialisasi data_confirm sebagai null
             for (const Id in data_product) {
-                if (data_product.hasOwnProperty(Id) && data_product[Id].id_produk === product) {
+                if (data_product.hasOwnProperty(Id) && data_product[Id].id_produk == product) {
                     data_stock = data_product[Id].stock; // Tetapkan data_confirm ke objek order jika no_resi cocok
                     break; // Keluar dari loop setelah menemukan data yang cocok
                 }

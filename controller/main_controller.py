@@ -39,26 +39,13 @@ class main_controller():
     
     def gudang(self):
         # Fetch stock data from Firebase
-        stock_ref = db.reference('stock')
+        stock_ref = db.reference('inventaris')
         stock_data = stock_ref.get()
 
-        # If stock_data is None or empty, initialize it with default values
-        if not stock_data:
-            default_stock = [
-                {"id_produk": "RA", "nama_produk": "Roda A", "stock": 0},
-                {"id_produk": "RB", "nama_produk": "Roda B", "stock": 0},
-                {"id_produk": "RC", "nama_produk": "Roda C", "stock": 0},
-                {"id_produk": "FA", "nama_produk": "Frame A", "stock": 0},
-                {"id_produk": "FB", "nama_produk": "Frame B", "stock": 0},
-                {"id_produk": "FC", "nama_produk": "Frame C", "stock": 0},
-                {"id_produk": "SA", "nama_produk": "Stang A", "stock": 0},
-                {"id_produk": "SB", "nama_produk": "Stang B", "stock": 0},
-                {"id_produk": "SC", "nama_produk": "Stang C", "stock": 0},
-            ]
-            stock_ref.set(default_stock)
-            stock_data = default_stock
+        # Extract product_name and quantity
+        stock_items = [{'product_name': item['product_name'], 'quantity': item['quantity']} for item in stock_data.values()]
 
-        return render_template('gudang.html', stock_data=stock_data)
+        return render_template('gudang.html', stock_items=stock_items)
     
     def pemasok(self):
         return render_template('pemasok.html')

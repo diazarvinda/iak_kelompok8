@@ -21,43 +21,26 @@
         <div class="overflow-x-auto shadow-md text-xs mb-5 rounded-lg">
             <table id="partsTable" class="w-full border-collapse">
                 <thead>
-                    <tr class="bg-gray-100 text-gray-600">
-                        <th class="text-left py-3 px-4 font-semibold border-b">ID Produk</th>
-                        <th class="text-left py-3 px-4 font-semibold border-b">Nama Produk</th>
-                        <th class="text-left py-3 px-4 font-semibold border-b">Stock</th>
+                    <tr>
+                        <th
+                            class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600">
+                            Product Name</th>
+                        <th
+                            class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600">
+                            Quantity</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white">
-                    {% for item in stock_data %}
+                <tbody>
+                    {% for item in stock_items %}
                     <tr>
-                        <td class="py-3 px-4 border-b">{{ item.id_produk }}</td>
-                        <td class="py-3 px-4 border-b">{{ item.nama_produk }}</td>
-                        <td class="py-3 px-4 border-b">{{ item.stock }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ item.product_name }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ item.quantity }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <table id="bikeTable" class="w-full border-collapse hidden">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-600">
-                        <th class="text-left py-3 px-4 font-semibold border-b">Sepeda Ontel</th>
-                        <th class="text-left py-3 px-4 font-semibold border-b">Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white">
-                    <tr>
-                        <td class="py-3 px-4 border-b">Sepeda Ontel A</td>
-                        <td class="py-3 px-4 border-b" id="bikeACount">0</td>
-                    </tr>
-                    <tr>
-                        <td class="py-3 px-4 border-b">Sepeda Ontel B</td>
-                        <td class="py-3 px-4 border-b" id="bikeBCount">0</td>
-                    </tr>
-                    <tr>
-                        <td class="py-3 px-4 border-b">Sepeda Ontel C</td>
-                        <td class="py-3 px-4 border-b" id="bikeCCount">0</td>
-                    </tr>
-                </tbody>
+                <!-- Bike table content will go here -->
             </table>
         </div>
     </div>
@@ -84,48 +67,6 @@
                 toggleText.textContent = 'Tampilkan Sepeda';
             }
         });
-
-        function calculateBikes() {
-            const parts = {
-                'Roda A': 0,
-                'Frame A': 0,
-                'Stang A': 0,
-                'Roda B': 0,
-                'Frame B': 0,
-                'Stang B': 0,
-                'Roda C': 0,
-                'Frame C': 0,
-                'Stang C': 0
-            };
-
-            document.querySelectorAll('#partsTable tbody tr').forEach(row => {
-                const name = row.cells[1].textContent;
-                const stock = parseInt(row.cells[2].textContent);
-                if (parts.hasOwnProperty(name)) {
-                    parts[name] = stock;
-                }
-            });
-
-            const bikeACount = Math.min(
-                Math.floor(parts['Roda A']),
-                parts['Frame A'],
-                parts['Stang A']
-            );
-            const bikeBCount = Math.min(
-                Math.floor(parts['Roda B']),
-                parts['Frame B'],
-                parts['Stang B']
-            );
-            const bikeCCount = Math.min(
-                Math.floor(parts['Roda C']),
-                parts['Frame C'],
-                parts['Stang C']
-            );
-
-            document.getElementById('bikeACount').textContent = bikeACount;
-            document.getElementById('bikeBCount').textContent = bikeBCount;
-            document.getElementById('bikeCCount').textContent = bikeCCount;
-        }
     });
 </script>
 
