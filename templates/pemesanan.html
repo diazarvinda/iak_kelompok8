@@ -14,8 +14,7 @@
                 <p id="successMessage"></p>
             </div>
             <!-- Error Message Box -->
-            <div id="errorBox"
-                class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl w-64">
+            <div id="errorBox" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl w-64">
                 <p id="errorMessage"></p>
             </div>
         </div>
@@ -57,14 +56,16 @@
                         <td class="py-2 px-4 border-b border-gray-200">{{ order.date }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">
                             {% for item in order.cart %}
-                            {{ item.product }} ({{ item.quantity }})<br>
+                            {{ item.product_name }} ({{ item.quantity }})<br>
                             {% endfor %}
                         </td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ order.id_distributor }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">Rp{{ "{:,}".format(order.total_price|int + order.harga_pengiriman|int) }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">
+                            Rp{{ "{:,}".format(order.total_price|int + order.harga_pengiriman|int) }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ order.lama_pengiriman }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">
-                            <button onclick="event.preventDefault(), trackOrder('{{ order.id_distributor }}', '{{ order.no_resi }}')"
+                            <button
+                                onclick="event.preventDefault(), trackOrder('{{ order.id_distributor }}', '{{ order.no_resi }}')"
                                 class="bg-yellow-400 text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-yellow-500 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400">
                                 Track Order
                             </button>
@@ -87,7 +88,8 @@
         <div id="orderDetails"></div>
         <div class="mt-4 flex justify-end">
             <button id="confirmButton" onclick="confirmOrder('{{ order_id }}')"
-                class="bg-[#40DDC1] text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]" disabled>
+                class="bg-[#40DDC1] text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]"
+                disabled>
                 Konfirmasi Barang Sampai
             </button>
         </div>
@@ -131,7 +133,7 @@
 
     document.getElementById('checkoutModal').addEventListener('click', closeModal);
 
-    async function trackOrder(idDistributor,noResi) {
+    async function trackOrder(idDistributor, noResi) {
         console.log(`${idDistributor} dan ${noResi}`);
 
         const response = await fetch('/api/track/order', {
@@ -151,10 +153,12 @@
         const confirmButton = document.getElementById('confirmButton');
 
         if (distributorData.status === "Arrived") {
-            confirmButton.className = "bg-[#40DDC1] text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]";
+            confirmButton.className =
+                "bg-[#40DDC1] text-white rounded-md py-2 px-4 text-sm font-semibold hover:bg-[#33b89d] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#40DDC1]";
             confirmButton.disabled = false;
         } else {
-            confirmButton.className = "bg-black text-white rounded-md py-2 px-4 text-sm font-semibold cursor-not-allowed";
+            confirmButton.className =
+                "bg-black text-white rounded-md py-2 px-4 text-sm font-semibold cursor-not-allowed";
             confirmButton.disabled = true;
         }
 

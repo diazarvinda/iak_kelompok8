@@ -171,13 +171,19 @@
         }
 
         if (quantity > data_product[product].stock) {
-            showError(`Stok tidak cukup. Tersedia: ${data_product[supplier].stock}`);
+            showError(`Stok tidak cukup. Tersedia: ${data_product[product].stock}`);
+            return;
+        }
+
+        const existingItemIndex = cart.findIndex(item => item.product === product);
+        const existingQuantity = existingItemIndex !== -1 ? cart[existingItemIndex].quantity : 0;
+
+        if (quantity + existingQuantity > data_product[product].stock) {
+            showError(`Stok tidak cukup. Tersedia: ${data_product[product].stock - existingQuantity}`);
             return;
         }
 
         const productData = data_product[product];
-        const existingItemIndex = cart.findIndex(item => item.product === product);
-
 
         if (existingItemIndex !== -1) {
             cart[existingItemIndex].quantity += quantity;
@@ -206,11 +212,13 @@
             return;
         }
 
+        console.log(cart);
+
         cartSection.classList.remove('hidden');
         cart.forEach((item, index) => {
             const row = cartItems.insertRow();
             row.innerHTML = `
-                <td class="py-2 px-4 border-b">${item.product}</td>
+                <td class="py-2 px-4 border-b">${item.product_name}</td>
                 <td class="py-2 px-4 border-b">${item.quantity}</td>
                 <td class="py-2 px-4 border-b">Rp ${item.harga.toLocaleString()}</td>
                 <td class="py-2 px-4 border-b">Rp ${(item.harga * item.quantity).toLocaleString()}</td>
@@ -263,7 +271,7 @@
         displayCheckoutModal(distributor);
     }
 
-    async function displayCheckoutModal(distributor,) {
+    async function displayCheckoutModal(distributor, ) {
         let totalPrice = cart.reduce((sum, item) => sum + item.harga * item.quantity, 0);
         let totalWeight = cart.reduce((sum, item) => sum + item.berat * item.quantity, 0);
         const supplier = cart[0].supplier;
@@ -329,7 +337,7 @@
                     distributor,
                     'total_price': totalPrice + distributorData['harga_pengiriman'],
                     cart
-                    
+
                 })
             });
             const result = await response.json();
