@@ -173,9 +173,9 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
 - **Contoh Response:**
   ```json
     {
-    "harga_pengiriman": 50000,  // Biaya pengiriman yang dihitung oleh distributor
-    "lama_pengiriman": "3-5 hari",  // Estimasi waktu pengiriman
-    "transaction_id": "123e4567-e89b-12d3-a456-426614174000"  // ID transaksi yang dihasilkan
+    "harga_pengiriman": 50000,  
+    "lama_pengiriman": "3 hari",  
+    "transaction_id": "123e4567-e89b-12d3-a456-426614174000"  
     }
   ```
 
@@ -188,10 +188,10 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
   POST /api/submit_order
 
   {
-        "id_supplier": "SUP01",  // ID supplier yang dipilih
-        "id_log": "123e4567-e89b-12d3-a456-426614174000",  // ID log transaksi dari distributor
-        "id_distributor": "DIS01",  // ID distributor yang dipilih
-        "total_price": 550000,  // Total harga termasuk biaya pengiriman
+        "id_supplier": "SUP01",  
+        "id_log": "123e4567-e89b-12d3-a456-426614174000", 
+        "id_distributor": "DIS01", 
+        "total_price": 550000,  
         "cart": [
             {
                 "supplier": "SUP01",
