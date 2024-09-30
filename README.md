@@ -2,7 +2,10 @@
 
 ## Anggota | Kelompok 8
 - 162112133009 | Diaz Arvinda Ardian
-- [Tambahkan anggota lainnya]
+- 162112133028 | Denis Muhammad Jethro
+- 164221010 | Aqila Hana Winanggoro
+- 164221016 | Jihan Ashifa Hakim
+- 164221079 | Patricia Dewinta Wahyu Krisnayanti
 
 ## Deskripsi Umum
 Modul **Retail** bertanggung jawab untuk mengelola transaksi dan pemesanan produk yang dilakukan oleh toko (retail) kepada supplier. Sistem ini melibatkan proses login, manajemen keranjang belanja, pemesanan barang dari pemasok, dan pelacakan status pesanan. Sistem berinteraksi dengan modul **Supplier** dan **Distributor** melalui RESTful API.
