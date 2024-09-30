@@ -19,9 +19,6 @@ Modul **Retail** bertanggung jawab untuk mengelola transaksi dan pemesanan produ
 #### Overview
 API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan lainnya. Dibangun menggunakan Flask dan terintegrasi dengan Firebase untuk penyimpanan data.
 
-#### Autentikasi
-Beberapa endpoint memerlukan pengguna untuk login. Pastikan Anda memiliki sesi yang valid sebelum mengakses endpoint ini.
-
 #### Endpoints:
 
 #### 1. User Authentication
