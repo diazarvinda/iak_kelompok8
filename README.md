@@ -238,4 +238,4 @@ Modul **Retail** bertanggung jawab untuk mengelola transaksi dan pemesanan produ
 - **Backend**: Python (Flask)
 - **Database**: Firebase
 - **Frontend**: HTML, CSS, JavaScript
-- **API Integrasi**: -
+- **API Integrasi**: RESTful API
