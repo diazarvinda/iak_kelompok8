@@ -30,9 +30,9 @@ class api_controller():
             stock_dict = {key: value for key, value in stock_data.items()}
 
             bike_parts = {
-                'ALPHA': {'PROD001': 2, '3': 1, 'P03-16': 1},
-                'SIGMA': {'PROD002': 2, '4': 1, 'P03-17': 1},
-                'BETA': {'PROD003': 2, '5': 1, 'P03-18': 1}
+                'ALPHA': {'PROD001': 2, '3-PRO': 1, 'P03-16': 1},
+                'SIGMA': {'PROD002': 2, '4-PRO': 1, 'P03-17': 1},
+                'BETA': {'PROD003': 2, '5-PRO': 1, 'P03-18': 1}
             }
 
             for item in cart_items:

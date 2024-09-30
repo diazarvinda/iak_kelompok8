@@ -253,9 +253,9 @@
             const stockData = await response.json();
 
             const parts = {
-                'PROD001': 0, '3': 0, 'P03-16': 0,
-                'PROD002': 0, '4': 0, 'P03-17': 0,
-                'PROD003': 0, '5': 0, 'P03-18': 0
+                'PROD001': 0, '3-PRO': 0, 'P03-16': 0,
+                'PROD002': 0, '4-PRO': 0, 'P03-17': 0,
+                'PROD003': 0, '5-PRO': 0, 'P03-18': 0
             };
 
             for (const [key, value] of Object.entries(stockData)) {
@@ -265,9 +265,9 @@
             }
 
             bikeStocks = {
-                'Sepeda Ontel - ALPHA': Math.floor(Math.min(parts['PROD001'] / 2, parts['3'], parts['P03-16'])),
-                'Sepeda Ontel - SIGMA': Math.floor(Math.min(parts['PROD002'] / 2, parts['4'], parts['P03-17'])),
-                'Sepeda Ontel - BETA': Math.floor(Math.min(parts['PROD003'] / 2, parts['5'], parts['P03-18']))
+                'Sepeda Ontel - ALPHA': Math.floor(Math.min(parts['PROD001'] / 2, parts['3-PRO'], parts['P03-16'])),
+                'Sepeda Ontel - SIGMA': Math.floor(Math.min(parts['PROD002'] / 2, parts['4-PRO'], parts['P03-17'])),
+                'Sepeda Ontel - BETA': Math.floor(Math.min(parts['PROD003'] / 2, parts['5-PRO'], parts['P03-18']))
             };
 
             updateStockDisplay();

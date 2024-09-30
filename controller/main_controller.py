@@ -56,9 +56,9 @@ class main_controller():
     
     def calculate_bikes(self, stock_items):
         bike_formulas = {
-            'Sepeda Ontel - ALPHA': {'PROD001': 2, '3': 1, 'P03-16': 1},
-            'Sepeda Ontel - SIGMA': {'PROD002': 2, '4': 1, 'P03-17': 1},
-            'Sepeda Ontel - BETA': {'PROD003': 2, '5': 1, 'P03-18': 1},
+            'Sepeda Ontel - ALPHA': {'PROD001': 2, '3-PRO': 1, 'P03-16': 1},
+            'Sepeda Ontel - SIGMA': {'PROD002': 2, '4-PRO': 1, 'P03-17': 1},
+            'Sepeda Ontel - BETA': {'PROD003': 2, '5-PRO': 1, 'P03-18': 1},
         }
 
         bikes = {name: float('inf') for name in bike_formulas}
