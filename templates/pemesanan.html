@@ -198,6 +198,7 @@
             }
         }
 
+        console.log(data_confirm);
 
         fetch('/api/confirm_order', {
                 method: 'POST',
@@ -217,6 +218,8 @@
                     setTimeout(() => {
                         location.reload(); // Reload the page to reflect the changes
                     }, 3000);
+
+                    location.reload(); // Reload the page to reflect the changes
                 } else {
                     showSuccess('Error: ' + data.error);
                 }

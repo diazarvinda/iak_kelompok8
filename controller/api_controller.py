@@ -215,10 +215,36 @@ class api_controller():
     # Konfirmasi Pesanan
     def confirm_order(self):
         data = request.get_json()
-        print(data)
+        cart_data = data['data_confirm']['cart']
+        data_confirm = data['data_confirm']
 
+        for produk in cart_data:
+            product_ref = db.reference('inventaris').child(produk['product'])
+            existing_data = product_ref.get()
+            if existing_data:
+                new_quantity = existing_data['quantity'] + produk['quantity']
+                product_ref.update({
+                    'quantity': new_quantity,
+                    'berat': produk['berat'],
+                    'product_name': produk['product_name'],
+                    'supplier': produk['supplier']
+                })
+            else:
+                product_ref.set({
+                    'quantity': produk['quantity'],
+                    'berat': produk['berat'],
+                    'product_name': produk['product_name'],
+                    'supplier': produk['supplier']
+                })
         
-        # Menambah Data di Inventaris
-        # db.reference('inventaris').push(data)
+        data_order = db.reference('orders').get()
+        order_id = None
+        for order in data_order:
+            if data_order[order]['no_resi'] == data_confirm['no_resi']:
+                order_id = order
+                break
+            
+        db.reference('orders').child(order_id).delete()
 
-        # db.reference('orders').child(data['no_resi']).delete()
+        return jsonify({'message': 'Konfirmasi Berhasil'}), 200
+        
