@@ -135,7 +135,7 @@ class api_controller():
         order_data = {
             'no_resi': response_data['no_resi'],
             'id_distributor': data['distributor'],
-            'lama pengiriman': response_data['lama_pengiriman'], 
+            'lama_pengiriman': response_data['lama_pengiriman'], 
             'harga_pengiriman': response_data['harga_pengiriman'],
             'cart': data['cart'],
             'total_price': data['total_price'],
@@ -148,6 +148,41 @@ class api_controller():
             return jsonify({"message": "Order submitted successfully"}), 200
         except Exception as e:
             return jsonify({"error": f"Failed to submit order: {str(e)}"}), 500
+        
+    def track_order(self):
+        data = request.get_json()
+        print(data)
+
+        if not data['no_resi'] or not data['id_distributor']:  # Pastikan id_supplier ada
+            return jsonify({"error": "No resi, ID distributor, dan ID Supplier diperlukan"}), 400
+
+
+        if data['id_distributor'] == 'DIS01':
+            try:
+                response = requests.get('http://167.99.238.114:8000/track_order') # Ganti endpoint
+                distributor_data = response.json()
+                print(distributor_data)
+            except Exception as e:
+                return jsonify({"error": f"Gagal menghubungi distributor: {str(e)}"}), 500
+        elif data['id_distributor'] == 'DIS02':  
+            try:
+                response = requests.get('http://167.99.238.114:8000/track_order') # Sesuaikan endpoint jika berbeda
+                distributor_data = response.json()
+            except Exception as e:
+                return jsonify({"error": f"Gagal menghubungi distributor: {str(e)}"}), 500
+        elif data['id_distributor'] == 'DIS03':  
+            try:
+                response = requests.get(f"http://159.223.41.243:8000/api/status/{data['no_resi']}") # Sesuaikan endpoint jika berbeda
+                distributor_data = response.json()
+                
+            except Exception as e:
+                return jsonify({"error": f"Gagal menghubungi distributor: {str(e)}"}), 500
+        else:
+            return jsonify({"error": "Supplier tidak dikenali"}), 400
+
+        distributor_data['no_resi'] = data['no_resi']
+        return jsonify(distributor_data), 200
+
         
     def confirm_order(self, app):
         try:
