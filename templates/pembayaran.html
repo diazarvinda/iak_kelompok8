@@ -28,9 +28,9 @@
                     <select id="item" name="item" required
                         class="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="" disabled selected>Pilih Model</option>
-                        <option value="Sepeda Ontel A" id="optionA">Sepeda Ontel A - Rp 1.000.000</option>
-                        <option value="Sepeda Ontel B" id="optionB">Sepeda Ontel B - Rp 1.500.000</option>
-                        <option value="Sepeda Ontel C" id="optionC">Sepeda Ontel C - Rp 2.000.000</option>
+                        <option value="Sepeda Ontel - ALPHA" id="optionA">Sepeda Ontel - ALPHA - Rp 10.000.000</option>
+                        <option value="Sepeda Ontel - SIGMA" id="optionB">Sepeda Ontel - SIGMA - Rp 15.000.000</option>
+                        <option value="Sepeda Ontel - BETA" id="optionC">Sepeda Ontel - BETA - Rp 20.000.000</option>
                     </select>
                 </div>
                 <div class="w-full px-4">
@@ -93,9 +93,9 @@
 <script type="module">
     let cart = []; // Initialize an empty cart array
     const prices = {
-        "Sepeda Ontel A": 1000000,
-        "Sepeda Ontel B": 1500000,
-        "Sepeda Ontel C": 2000000
+        "Sepeda Ontel - ALPHA": 10000000,
+        "Sepeda Ontel - SIGMA": 15000000,
+        "Sepeda Ontel - BETA": 20000000
     };
     let bikeStocks = {}; // Will be populated in updateStockInfo
 
@@ -121,7 +121,8 @@
 
     // Function to add item to cart
     window.addToCart = function() {
-        const item = document.getElementById('item').value;
+        const itemSelect = document.getElementById('item');
+        const item = itemSelect.options[itemSelect.selectedIndex].value;
         const quantity = parseInt(document.getElementById('quantity').value, 10);
         const price = prices[item];  // Get price based on selected item
         const availableStock = bikeStocks[item] || 0;
@@ -153,7 +154,6 @@
         // Update the available stock
         bikeStocks[item] -= quantity;
         updateStockDisplay();
-
         displayCart();
         document.getElementById('transactionForm').reset(); // Reset the form
         document.getElementById('quantity').value = 1; // Reset quantity to 1
@@ -253,21 +253,21 @@
             const stockData = await response.json();
 
             const parts = {
-                'Roda A': 0, 'Frame A': 0, 'Stang A': 0,
-                'Roda B': 0, 'Frame B': 0, 'Stang B': 0,
-                'Roda C': 0, 'Frame C': 0, 'Stang C': 0
+                'PROD001': 0, '3': 0, 'P03-16': 0,
+                'PROD002': 0, '4': 0, 'P03-17': 0,
+                'PROD003': 0, '5': 0, 'P03-18': 0
             };
 
-            stockData.forEach(item => {
-                if (parts.hasOwnProperty(item.nama_produk)) {
-                    parts[item.nama_produk] = item.stock;
+            for (const [key, value] of Object.entries(stockData)) {
+                if (parts.hasOwnProperty(key)) {
+                    parts[key] = value.quantity;
                 }
-            });
+            }
 
             bikeStocks = {
-                'Sepeda Ontel A': Math.min(parts['Roda A'], parts['Frame A'], parts['Stang A']),
-                'Sepeda Ontel B': Math.min(parts['Roda B'], parts['Frame B'], parts['Stang B']),
-                'Sepeda Ontel C': Math.min(parts['Roda C'], parts['Frame C'], parts['Stang C'])
+                'Sepeda Ontel - ALPHA': Math.floor(Math.min(parts['PROD001'] / 2, parts['3'], parts['P03-16'])),
+                'Sepeda Ontel - SIGMA': Math.floor(Math.min(parts['PROD002'] / 2, parts['4'], parts['P03-17'])),
+                'Sepeda Ontel - BETA': Math.floor(Math.min(parts['PROD003'] / 2, parts['5'], parts['P03-18']))
             };
 
             updateStockDisplay();
@@ -283,9 +283,9 @@
         document.getElementById('currentStock').textContent = currentStock;
 
         // Disable options for bikes with no stock
-        document.getElementById('optionA').disabled = bikeStocks['Sepeda Ontel A'] === 0;
-        document.getElementById('optionB').disabled = bikeStocks['Sepeda Ontel B'] === 0;
-        document.getElementById('optionC').disabled = bikeStocks['Sepeda Ontel C'] === 0;
+        document.getElementById('optionA').disabled = bikeStocks['Sepeda Ontel - ALPHA'] === 0;
+        document.getElementById('optionB').disabled = bikeStocks['Sepeda Ontel - SIGMA'] === 0;
+        document.getElementById('optionC').disabled = bikeStocks['Sepeda Ontel - BETA'] === 0;
     }
 
     // Call updateStockInfo when the page loads

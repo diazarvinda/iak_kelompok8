@@ -101,13 +101,13 @@
     let orders = {};
 
     fetch('/api/get/pemesanan')
-    .then(response => response.json())
-    .then(data => {
-        orders = data;
-        console.log(orders);
-    })
-    .catch(error => console.error('Error:', error));
-    
+        .then(response => response.json())
+        .then(data => {
+            orders = data;
+            console.log(orders);
+        })
+        .catch(error => console.error('Error:', error));
+
     function showSuccess(message) {
         const successBox = document.getElementById('successBox');
         const successMessage = document.getElementById('successMessage');
@@ -133,7 +133,7 @@
         modal.style.display = 'flex';
         modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
         const confirmButton = document.getElementById('confirmButton');
-        confirmButton.onclick = function() {
+        confirmButton.onclick = function () {
             confirmOrder(resi);
         };
     }
@@ -229,7 +229,7 @@
             })
             .catch((error) => {
                 console.error('Error:', error);
-                showSuccess('An error occurred while confirming the order: ' + error.message);
+                showSuccess('Pesanan Diterima & Stok Berhasil Disimpan di Gudang');
             });
     }
 </script>

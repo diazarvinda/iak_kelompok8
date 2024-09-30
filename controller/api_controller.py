@@ -13,48 +13,45 @@ class api_controller():
         return jsonify(transactions)
     
     def save_transaction(self):
-        cart_items = request.get_json()
-        transaction_id = str(uuid.uuid4())
-        transactions = []
-        stock_ref = db.reference('stock')
-        stock_data = stock_ref.get()
+        try:
+            cart_items = request.get_json()
+            transaction_id = str(uuid.uuid4())
+            total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+            transaction_data = {
+                'transaction_id': transaction_id,
+                'items': cart_items,
+                'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'total_price': total_price
+            }
 
-        # Convert stock_data to a dictionary for easier lookup
-        stock_dict = {item['nama_produk']: item for item in stock_data}
+            # Update stock and save transaction
+            stock_ref = db.reference('inventaris')
+            stock_data = stock_ref.get()
+            stock_dict = {key: value for key, value in stock_data.items()}
 
-        for item in cart_items:
-            model = item['item'].split()[-1]  # Get the model (A, B, or C)
-            parts = [f"Roda {model}", f"Frame {model}", f"Stang {model}"]
-            
-            # Check if all required parts are in stock
-            for part in parts:
-                if stock_dict[part]['stock'] < item['quantity']:
-                    return jsonify({"error": f"Stok tidak cukup untuk {part}"}), 400
+            bike_parts = {
+                'ALPHA': {'PROD001': 2, '3': 1, 'P03-16': 1},
+                'SIGMA': {'PROD002': 2, '4': 1, 'P03-17': 1},
+                'BETA': {'PROD003': 2, '5': 1, 'P03-18': 1}
+            }
 
-            # If we have enough stock, update the stock and save the transaction
-            try:
-                # Update stock
-                for part in parts:
-                    stock_dict[part]['stock'] -= item['quantity']
-                
-                # Save the transaction
-                transaction = {
-                    'transaction_id': transaction_id,
-                    'item': item['item'],
-                    'quantity': item['quantity'],
-                    'price': item['price'] * item['quantity'],
-                    'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                transactions.append(transaction)
-                db.reference('transactions').push(transaction)
-            except Exception as e:
-                return jsonify({"error": f"Failed to save transaction for {item['item']}: {str(e)}"}), 500
+            for item in cart_items:
+                model = item['item'].split()[-1]
+                parts = bike_parts[model]
 
-        # Update the stock in Firebase
-        stock_ref.set([stock_dict[key] for key in stock_dict])
+                for part, qty in parts.items():
+                    if stock_dict[part]['quantity'] < item['quantity'] * qty:
+                        return jsonify({"error": f"Stok tidak cukup untuk {part}"}), 400
 
-        return jsonify({"message": "Semua transaksi berhasil disimpan!"})
-    
+                for part, qty in parts.items():
+                    stock_dict[part]['quantity'] -= item['quantity'] * qty
+
+            db.reference('transactions').push(transaction_data)
+            stock_ref.set(stock_dict)
+
+            return jsonify({"message": "Semua transaksi berhasil disimpan!"}), 200
+        except Exception as e:
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
     
     # Gudang
     def get_stock_data(self):
@@ -108,7 +105,7 @@ class api_controller():
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP02':
             try:
-                response = requests.post('https://suplierman.pythonanywhere.com/api/distributor/cek_harga', json=data_post)
+                response = requests.post('http://165.22.187.192:8000/api/supplier/cek_harga', json=data_post)
                 distributor_data = response.json()
                 print(distributor_data)
             except Exception as e:
@@ -246,4 +243,3 @@ class api_controller():
         db.reference('orders').child(order_id).delete()
 
         return jsonify({'message': 'Konfirmasi Berhasil'}), 200
-        

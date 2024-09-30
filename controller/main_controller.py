@@ -35,6 +35,10 @@ class main_controller():
         transactions_ref = db.reference('transactions')
         transactions = transactions_ref.get()  # Fetch all transaction data
 
+        # If no transactions are found, set transactions to an empty list
+        if transactions is None:
+            transactions = []
+
         return render_template('histori.html', transactions=transactions)
     
     def gudang(self):
@@ -42,11 +46,30 @@ class main_controller():
         stock_ref = db.reference('inventaris')
         stock_data = stock_ref.get()
 
-        # Extract product_name and quantity
-        stock_items = [{'product_name': item['product_name'], 'quantity': item['quantity']} for item in stock_data.values()]
+        # Extract product_id, product_name, and quantity
+        stock_items = [{'product_id': key, 'product_name': value['product_name'], 'quantity': value['quantity']} for key, value in stock_data.items()]
 
-        return render_template('gudang.html', stock_items=stock_items)
+        # Calculate bikes
+        bike_items = self.calculate_bikes(stock_items)
+
+        return render_template('gudang.html', stock_items=stock_items, bike_items=bike_items)
     
+    def calculate_bikes(self, stock_items):
+        bike_formulas = {
+            'Sepeda Ontel - ALPHA': {'PROD001': 2, '3': 1, 'P03-16': 1},
+            'Sepeda Ontel - SIGMA': {'PROD002': 2, '4': 1, 'P03-17': 1},
+            'Sepeda Ontel - BETA': {'PROD003': 2, '5': 1, 'P03-18': 1},
+        }
+
+        bikes = {name: float('inf') for name in bike_formulas}
+
+        for bike, parts in bike_formulas.items():
+            for part, required_qty in parts.items():
+                available_qty = next((item['quantity'] for item in stock_items if item['product_id'] == part), 0)
+                bikes[bike] = min(bikes[bike], available_qty // required_qty)
+
+        return [{'bike_name': bike, 'quantity': int(qty)} for bike, qty in bikes.items()]
+
     def pemasok(self):
         return render_template('pemasok.html')
     

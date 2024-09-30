@@ -28,6 +28,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.template_filter('to_currency')
+def to_currency(value):
+    return f"Rp {value:,.0f}".replace(",", ".")
+
 @app.route('/', methods=['GET', 'POST'])
 def login(): return main_controller().login()
 
@@ -36,8 +40,6 @@ def set_session(): return main_controller().set_session()
 
 @app.route('/register', methods=['GET', 'POST'])
 def register(): return main_controller().register()
-
-
 
 # Semua View Route
 @app.route('/about')
@@ -67,10 +69,7 @@ def pemesanan(): return main_controller().pemesanan()
 @app.route('/logout', methods=['GET'])
 def logout():return main_controller().logout()
 
-
-
 # Semua API
-
 # API untuk mengambil data transaksi (Internal)
 @app.route('/api/get/transaction_data', methods=['GET'])
 def get_transactions_data(): return api_controller().get_transactions_data()
@@ -96,10 +95,8 @@ def track_order(): return api_controller().track_order()
 @app.route('/api/get/pemesanan', methods=['GET'])
 @login_required
 def get_data_pemesanan(): return api_controller().get_data_pemesanan()
-# ----------------------------------------------------------------------------------------------------------------------
 
-
-#API untuk transaksi dengan role lain
+# API untuk transaksi dengan role lain
 @app.route('/api/get/supplier_stock/<supplier>', methods=['GET'])
 @login_required
 def get_supplier_stock(supplier): return api_controller().get_supplier_stock(supplier)
@@ -111,7 +108,6 @@ def get_distributor_price(): return api_controller().get_distributor_price()
 @app.route('/api/submit_order', methods=['POST'])
 @login_required
 def submit_order(): return api_controller().submit_order()
-
 
 
 if __name__ == '__main__':

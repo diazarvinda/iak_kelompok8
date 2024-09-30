@@ -23,7 +23,7 @@
     </div>
 
     <!-- Transaction Table Container -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+    <div id="transactionContainer" class="bg-white rounded-lg shadow-md p-6 hidden">
         <div class="overflow-x-auto shadow-md text-xs mb-5 rounded-lg">
             <table class="w-full border-collapse">
                 <thead>
@@ -31,8 +31,7 @@
                         <th class="text-left py-3 px-4 font-semibold border-b">ID</th>
                         <th class="text-left py-3 px-4 font-semibold border-b">Item</th>
                         <th class="text-left py-3 px-4 font-semibold border-b">Waktu</th>
-                        <th class="text-left py-3 px-4 font-semibold border-b">Jumlah</th>
-                        <th class="text-left py-3 px-4 font-semibold border-b">Harga</th>
+                        <th class="text-left py-3 px-4 font-semibold border-b">Total Harga</th>
                         <th class="text-left py-3 px-4 font-semibold border-b">Aksi</th>
                     </tr>
                 </thead>
@@ -62,15 +61,9 @@
         </div>
     </div>
 
-    <!-- Success Message Box -->
-    <div id="successBox"
-        class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl mt-5 w-full">
-        <p id="successMessage"></p>
-    </div>
-
-    <!-- Error Message Box -->
-    <div id="errorBox" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mt-5 w-full">
-        <p id="errorMessage"></p>
+    <!-- No Transactions Message -->
+    <div id="noTransactionsMessage" class="hidden text-center text-gray-500">
+        Tidak ada transaksi
     </div>
 
     <!-- Overlay for background dimming -->
@@ -142,19 +135,30 @@
     // Display transactions for the current page
     function displayTransactions() {
         const transactionTable = document.getElementById('transactionTable');
+        const transactionContainer = document.getElementById('transactionContainer');
+        const noTransactionsMessage = document.getElementById('noTransactionsMessage');
         transactionTable.innerHTML = ''; // Clear the table
+
+        if (transactions.length === 0) {
+            transactionContainer.classList.add('hidden');
+            noTransactionsMessage.classList.remove('hidden');
+            return;
+        } else {
+            transactionContainer.classList.remove('hidden');
+            noTransactionsMessage.classList.add('hidden');
+        }
 
         const start = (currentPage - 1) * transactionsPerPage;
         const end = start + transactionsPerPage;
         const paginatedTransactions = transactions.slice(start, end);
 
         paginatedTransactions.forEach(([id, transaction]) => {
-            const formattedPrice = formatRupiah(transaction.price); // Format the price
+            const formattedPrice = formatRupiah(transaction.total_price); // Format the total price
+            const items = Array.isArray(transaction.items) ? transaction.items.map(item => `${item.item} (${item.quantity})`).join(', ') : 'No items'; // Format items
             const row = `<tr>
                 <td class="py-3 px-4 border-b">${transaction.transaction_id}</td>
-                <td class="py-3 px-4 border-b">${transaction.item}</td>
+                <td class="py-3 px-4 border-b">${items}</td>
                 <td class="py-3 px-4 border-b">${transaction.date}</td>
-                <td class="py-3 px-4 border-b">${transaction.quantity}</td>
                 <td class="py-3 px-4 border-b">${formattedPrice}</td>
                 <td class="py-3 px-4 border-b text-center">
                     <button class="bg-[#DD406C] text-white p-2 rounded-md hover:bg-[#c2385d] transition duration-300 ease-in-out" onclick="openDeleteModal('${id}')">
@@ -231,65 +235,78 @@
         errorBox.classList.add('hidden'); // Hide the error box
     }
 
-    // ... existing code ...
+    window.confirmDelete = function () {
+        const id = document.getElementById('deleteTransactionId').value;
+        const transactionRef = ref(database, 'transactions/' + id);
 
-window.confirmDelete = function () {
-    const id = document.getElementById('deleteTransactionId').value;
-    const transactionRef = ref(database, 'transactions/' + id);
+        // First, get the transaction details
+        get(transactionRef).then((snapshot) => {
+            const transaction = snapshot.val();
+            if (transaction) {
+                const items = transaction.items;
 
-    // First, get the transaction details
-    get(transactionRef).then((snapshot) => {
-        const transaction = snapshot.val();
-        if (transaction) {
-            // Extract the model (A, B, or C) from the item name
-            const model = transaction.item.split(' ').pop();
-            const quantity = transaction.quantity;
-
-            // Update stock
-            updateStock(model, quantity).then(() => {
-                // After updating stock, remove the transaction
-                remove(transactionRef).then(() => {
-                    showSuccessMessage("Transaksi berhasil dihapus dan stok dikembalikan.");
-                    closeDeleteModal();
+                // Update stock
+                updateStock(items).then(() => {
+                    // After updating stock, remove the transaction
+                    remove(transactionRef).then(() => {
+                        showSuccessMessage("Transaksi berhasil dihapus dan stok dikembalikan.");
+                        closeDeleteModal();
+                        loadTransactions(); // Reload transactions after deletion
+                    }).catch((error) => {
+                        showErrorMessage("Terjadi kesalahan saat menghapus transaksi: " + error.message);
+                    });
                 }).catch((error) => {
-                    showErrorMessage("Terjadi kesalahan saat menghapus transaksi: " + error.message);
+                    showErrorMessage("Terjadi kesalahan saat memperbarui stok: " + error.message);
                 });
-            }).catch((error) => {
-                showErrorMessage("Terjadi kesalahan saat memperbarui stok: " + error.message);
-            });
-        } else {
-            showErrorMessage("Transaksi tidak ditemukan.");
-        }
-    }).catch((error) => {
-        showErrorMessage("Terjadi kesalahan saat mengambil data transaksi: " + error.message);
-    });
-}
-
-function updateStock(model, quantity) {
-    const stockRef = ref(database, 'stock');
-    return get(stockRef).then((snapshot) => {
-        let stock = snapshot.val();
-        if (!stock) {
-            throw new Error("Data stok tidak ditemukan.");
-        }
-
-        // Update stock for each part
-        const partsToUpdate = [`Roda ${model}`, `Frame ${model}`, `Stang ${model}`];
-        partsToUpdate.forEach(part => {
-            const partIndex = stock.findIndex(item => item.nama_produk === part);
-            if (partIndex !== -1) {
-                stock[partIndex].stock += quantity;
             } else {
-                throw new Error(`Part ${part} tidak ditemukan dalam stok.`);
+                showErrorMessage("Transaksi tidak ditemukan.");
             }
+        }).catch((error) => {
+            showErrorMessage("Terjadi kesalahan saat mengambil data transaksi: " + error.message);
         });
+    }
 
-        // Update the stock in Firebase
-        return set(stockRef, stock);
-    });
-}
+    function updateStock(items) {
+        const stockRef = ref(database, 'inventaris');
+        return get(stockRef).then((snapshot) => {
+            let stock = snapshot.val();
+            if (!stock) {
+                throw new Error("Data stok tidak ditemukan.");
+            }
 
-// ... rest of the existing code ...
+            // Define the parts required for each bike model
+            const bikeParts = {
+                'ALPHA': {'PROD001': 2, '3': 1, 'P03-16': 1},
+                'SIGMA': {'PROD002': 2, '4': 1, 'P03-17': 1},
+                'BETA': {'PROD003': 2, '5': 1, 'P03-18': 1}
+            };
+
+            // Update stock for each item in the transaction
+            if (Array.isArray(items)) {
+                items.forEach(item => {
+                    const model = item.item.split(' - ')[1]; // Extract model from item name
+                    const parts = bikeParts[model];
+
+                    if (parts) {
+                        for (const [part, qty] of Object.entries(parts)) {
+                            if (stock[part]) {
+                                stock[part].quantity += item.quantity * qty;
+                            } else {
+                                throw new Error(`Part ${part} tidak ditemukan dalam stok.`);
+                            }
+                        }
+                    } else {
+                        throw new Error(`Model sepeda ${model} tidak dikenali.`);
+                    }
+                });
+            } else {
+                throw new Error("Items is not an array.");
+            }
+
+            // Update the stock in Firebase
+            return set(stockRef, stock);
+        });
+    }
 
     function showSuccessMessage(message) {
         const successBox = document.getElementById('successBox');
