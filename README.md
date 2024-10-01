@@ -10,6 +10,9 @@
 ## Deskripsi Umum
 Modul **Retail** bertanggung jawab untuk mengelola transaksi dan pemesanan produk yang dilakukan oleh toko (retail) kepada supplier. Sistem ini melibatkan proses login, manajemen keranjang belanja, pemesanan barang dari pemasok, dan pelacakan status pesanan. Sistem berinteraksi dengan Modul **Supplier** dan **Distributor** melalui RESTful API.
 
+## Link Github Project:
+https://github.com/diazarvinda/iak_kelompok8
+
 ---
 
 ## Fitur dan Endpoint API yang Tersedia
