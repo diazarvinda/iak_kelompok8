@@ -63,7 +63,7 @@ class api_controller():
     def get_supplier_stock(self, supplier):
         if supplier == 'SUP01':
             try:
-                response = requests.get('http://167.99.238.114:8000/products')
+                response = requests.get('http://167.99.238.114:8000/api/products')
                 stock_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
@@ -94,11 +94,12 @@ class api_controller():
         data = request.get_json()
         data_post = data.copy()
         del data_post['id_supplier']
+        print('data post:', data_post)
 
 
         if data['id_supplier'] == 'SUP01':
             try:
-                response = requests.post('http://167.99.238.114:8000/check_price', json=data_post)
+                response = requests.post('http://167.99.238.114:8000/api/check_price', json=data_post)
                 distributor_data = response.json()
                 print(distributor_data)
             except Exception as e:
@@ -107,7 +108,7 @@ class api_controller():
             try:
                 response = requests.post('http://165.22.187.192:8000/api/supplier/cek_harga', json=data_post)
                 distributor_data = response.json()
-                print(distributor_data)
+                # print(distributor_data)
             except Exception as e:
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP03':
@@ -129,7 +130,7 @@ class api_controller():
         
         if data['id_supplier'] == 'SUP01':
             try:
-                response = requests.post('http://167.99.238.114:8000/place_order', json=data_post)
+                response = requests.post('http://167.99.238.114:8000/api/place_order', json=data_post)
                 response_data = response.json()
                 print(response_data)
             except Exception as e:
