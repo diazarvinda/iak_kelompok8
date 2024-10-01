@@ -75,7 +75,7 @@ class api_controller():
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
         elif supplier == 'SUP03':
             try:
-                response = requests.get('http://167.99.238.114:8000/products')
+                response = requests.get('https://supplier3.pythonanywhere.com/api/products')
                 stock_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
@@ -113,7 +113,7 @@ class api_controller():
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP03':
             try:
-                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
+                response = requests.post('https://supplier3.pythonanywhere.com/api/cek_harga', json=data_post)
                 distributor_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
