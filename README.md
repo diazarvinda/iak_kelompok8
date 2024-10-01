@@ -57,7 +57,7 @@ API ini menyediakan endpoint untuk mengelola transaksi, data stok, pesanan, dan 
 ### 2. Transactions
 
 #### a. Get Transactions Data
-- **URL:** `/api/get/transaction_data`
+- **URL:** `[/api/get/transaction_data](https://suplierman.pythonanywhere.com/products/api/products)`
 - **Method:** `GET`
 - **Deskripsi:** Mengambil semua data transaksi.
 - **Contoh Request:**
