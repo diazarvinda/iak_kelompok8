@@ -75,7 +75,7 @@ class api_controller():
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
         elif supplier == 'SUP03':
             try:
-                response = requests.get('https://supplier3.pythonanywhere.com/api/products')
+                response = requests.get('http://192.241.128.66:8000/api/products')
                 stock_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Failed to fetch supplier stock: {str(e)}"}), 500
@@ -113,7 +113,7 @@ class api_controller():
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP03':
             try:
-                response = requests.post('https://supplier3.pythonanywhere.com/api/cek_harga', json=data_post)
+                response = requests.post('http://192.241.128.66:8000/api/cek_harga', json=data_post)
                 distributor_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
@@ -143,7 +143,7 @@ class api_controller():
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
         elif data['id_supplier'] == 'SUP03':
             try:
-                response = requests.post('http://167.99.238.114:8000/api/hehe', json=data_post)
+                response = requests.post('http://192.241.128.66:8000/api/checkout', json=data_post)
                 response_data = response.json()
             except Exception as e:
                 return jsonify({"error": f"Gagal mengambil data distributor: {str(e)}"}), 500
@@ -199,7 +199,6 @@ class api_controller():
             return jsonify({"error": "Supplier tidak dikenali"}), 400
 
         distributor_data['no_resi'] = data['no_resi']
-        distributor_data['status'] = "Arrived"
         return jsonify(distributor_data), 200
 
     def get_data_pemesanan(self):
