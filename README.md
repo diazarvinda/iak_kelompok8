@@ -1,4 +1,4 @@
-# Sistem Supply Chain Management - Modul Retail | Integrasi Aplikasi Korporasi
+# Sistem Supply Chain Management - Modul Retail | PedalXPress
 
 ## Anggota | Kelompok 8
 - 162112133009 | Diaz Arvinda Ardian
