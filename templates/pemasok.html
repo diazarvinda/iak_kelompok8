@@ -314,6 +314,8 @@
 
             const grandTotal = totalPrice + distributorData['harga_pengiriman'];
             const orderDetails = document.getElementById('orderDetails');
+
+            
             orderDetails.innerHTML = `
                 <p>Total Harga: Rp ${totalPrice.toLocaleString()}</p>
                 <p>Biaya Pengiriman (${distributor}): Rp ${distributorData['harga_pengiriman'].toLocaleString()}</p>
@@ -348,7 +350,7 @@
                 },
                 body: JSON.stringify({
                     'id_supplier': cart[0].supplier,
-                    'id_log': distributorData['transaction_id'],
+                    'id_log': distributorData['id_log'],
                     distributor,
                     'total_price': totalPrice + distributorData['harga_pengiriman'],
                     cart
