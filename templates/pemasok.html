@@ -317,6 +317,7 @@
             orderDetails.innerHTML = `
                 <p>Total Harga: Rp ${totalPrice.toLocaleString()}</p>
                 <p>Biaya Pengiriman (${distributor}): Rp ${distributorData['harga_pengiriman'].toLocaleString()}</p>
+                <p>Lama Pengiriman: ${distributorData['lama_pengiriman']}</p>
                 <p>Total Keseluruhan: Rp ${grandTotal.toLocaleString()}</p>
             `;
 
